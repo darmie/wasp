@@ -1,0 +1,14 @@
+{
+  "name": "Wasp",
+  "url" : "https://github.com/YOUR_NAME/Wasp/",
+  "license": "MIT",
+  "tags": ["haxe","js"],
+  "description": "description of Wasp",
+  "classPath": "src",
+  "version": "0.0.1",
+  "releasenote": "Initial release",
+  "contributors": ["YOUR_NAME"],
+  "dependencies": {
+
+  }
+}
