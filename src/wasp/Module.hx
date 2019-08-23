@@ -393,7 +393,17 @@ class Module {
 		return linearMemoryIndexSpace[0].get(index);
 	}
 
+	/**
+	 * returns a custom section with a specific name, if it exists.
+	 * @param name 
+	 * @return Custom
+	 */
 	public function custom(name:String):Custom {
+		for(s in customs){
+			if(s.name == name){
+				return s;
+			}
+		}
 		return null;
 	}
 }
