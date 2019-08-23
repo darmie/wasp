@@ -6,11 +6,12 @@ WebAssembly Utility for Haxe
  * Validate `.wasm` [WIP]
 
 
-_WASP_ is based on [Wagon](https://github.com/go-interpreters/wagon), a WebAssembly interpreter in [Go](https://golang.org)
+__WASP__ is based on portions of [Wagon](https://github.com/go-interpreters/wagon), a WebAssembly interpreter in [Go](https://golang.org), and ported to the [Haxe](https://haxe.org) programming language.
 
 ### Dependencies
 
  * [Haxe](https://haxe.org/)
+ * [Binary128](https://github.com/darmie/binary128)
 
 Run `haxelib install all` to install the dependencies.
 
