@@ -1,3 +1,6 @@
 -main Main
 -cp src/
--js bin/Wasp.js
+-cp binary128/src/
+
+-lib console.hx
+# -js bin/Wasp.js
