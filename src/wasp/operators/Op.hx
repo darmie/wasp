@@ -27,6 +27,22 @@ class Op {
 		this.code = code;
 	}
 
+	public static function New(code:Int) {
+		var buf = new BytesBuffer();
+		buf.addByte(code);
+		
+		if(code >= ops.length || internalOpcodes[code]){
+			throw 'Invalid opcode: 0x${buf.getBytes().toHex()}';
+		}
+
+		var op = ops[code];
+		if(!op.isValid()){
+			throw 'Invalid opcode: 0x${buf.getBytes().toHex()}';
+		}
+
+		return op;
+	}
+
 	// public static inline function newOp(code:Int):Int {
 	// 	if (ops[code].isValid()) {
 	// 		var buf = new BytesOutput();
