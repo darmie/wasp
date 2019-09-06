@@ -11,7 +11,9 @@ class LimitReader extends  BytesInput {
      */
     var N:Int;
     public function new(r:BytesInput, n) {
-        super(r.readAll());
+        var buf = new BytesOutput();
+        buf.writeInput(r);
+        super(buf.getBytes());
         N = n;
     }
 

@@ -9,12 +9,14 @@ class Read {
         if(n == 0){
             return null;
         }
-        var limited = new LimitReader(r, n);
-        var buf = new BytesOutput();
-        buf.writeInput(limited);
-        var num = buf.length;
+        var b = Bytes.alloc(n);
+        r.readBytes(b, 0, n);
+        // var limited = new LimitReader(r, n);
+        // var buf = new BytesOutput();
+        // buf.writeInput(limited);
+        var num = b.length;
         if(num == n){
-            return buf.getBytes();
+            return b;
         }
         throw Eof;
     }
@@ -30,10 +32,11 @@ class Read {
 
     public static function UTF8String(r:BytesInput, n) {
         var _bytes = bytes(r, n);
-        if(!haxe.Utf8.validate(_bytes.toString())){
+        var s = _bytes.toString();
+        if(!haxe.Utf8.validate(s)){
             throw "wasm: invalid utf-8 string";
         }
-        return _bytes.toString();
+        return s;
     }
 
     public static function UTF8StringUint(r:BytesInput) {

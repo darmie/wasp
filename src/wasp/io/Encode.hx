@@ -27,11 +27,11 @@ class Encode {
         w.write(p);
     }
 
-    public static function writeU32(w:BytesOutput, n:UInt) {
+    public static function writeU32(w:BytesOutput, n:U32) {
         LittleEndian.PutUint32(w, n);
     }
 
-    public static function writeU64(w:BytesOutput, n:UInt) {
+    public static function writeU64(w:BytesOutput, n:U64) {
         LittleEndian.PutUint64(w, n);
     }
 }

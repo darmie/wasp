@@ -16,7 +16,7 @@ class Globals extends RawSection {
         var count = Leb128.readUint32(r);
         globals = [];
 
-        for(i in 0...count){
+        for(i in 0...cast(count, Int)){
             var global = new GlobalEntry();
             global.fromWasm(r);
             globals.push(global);

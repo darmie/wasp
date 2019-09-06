@@ -1,9 +1,13 @@
 -main Test
 -cp src/
 -cp binary128/src/
+-cp binary128/numerix/src
 
 -lib hexlog
 -lib console.hx
-# -js bin/Wasp.js
+#-js bin/Wasp.js
+-D debug
 
--cs bin/wasp/bin/cs
+-java bin/wasp/java
+
+# -cs bin/wasp/bin/cs

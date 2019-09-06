@@ -1,5 +1,6 @@
 package wasp;
 
+import hex.log.HexLog;
 import haxe.Int32;
 import haxe.io.*;
 import wasp.Global.*;
@@ -17,14 +18,14 @@ import binary128.internal.Leb128;
 typedef ResolveFunc = (name:String) -> Module;
 
 typedef ImportsT = {
-	funcs:Array<Int>,
-	globals:Int,
-	tables:Int,
-	memories:Int
+	?funcs:Array<Int>,
+	?globals:Int,
+	?tables:Int,
+	?memories:Int
 }
 
 class Module {
-	public var version:UInt;
+	public var version:U32;
 	public var sections:Array<Section>;
 	public var functionIndexSpace:Array<Function>;
 	public var globalIndexSpace:Array<GlobalEntry>;
@@ -53,7 +54,15 @@ class Module {
 
 	var imports:ImportsT;
 
-	public function new() {}
+	public function new() {
+		sections = [];
+		globalIndexSpace = [];
+		customs = [];
+		functionIndexSpace = [];
+		imports = {
+			funcs: []
+		};
+	}
 
 	/**
 	 * This is the same as ReadModule, but it only decodes the module without
@@ -62,22 +71,23 @@ class Module {
 	 * @return Module
 	 */
 	public static function decode(r:BytesInput):Module {
-		var reader:ReadPos = new ReadPos(r);
-		reader.curPos = 0;
+		// var reader:ReadPos = new ReadPos(r);
+		// reader.curPos = 0;
 
 		var m = new Module();
 
 		var magic = Read.U32(r);
+
 		if (magic != Magic) {
 			throw "wasm: Invalid magic number";
 		}
 
-		var version = Read.U32(r);
-		if (m.version != version) {
-			throw 'wasm: unknown binary version: $version';
+		m.version = Read.U32(r);
+		if (m.version != Version) {
+			throw 'wasm: unknown binary version: ${m.version}';
 		}
-
-		new SectionsReader(m).readSections(reader);
+		
+		new SectionsReader(m).readSections(r);
 
 		return m;
 	}
@@ -108,7 +118,7 @@ class Module {
 				throw e;
 			}
 		}
-		Console.log('There are ${m.functionIndexSpace.length} entries in the function index space.');
+		HexLog.info('There are ${m.functionIndexSpace.length} entries in the function index space.');
 		return m;
 	}
 
@@ -116,7 +126,7 @@ class Module {
 		if (import_ == null)
 			return;
 
-		var modules:Map<String, Module>;
+		var modules:Map<String, Module>  = new Map<String, Module>();
 
 		var funcs = 0;
 		for (importEntry in import_.entries) {
@@ -218,9 +228,9 @@ class Module {
 		if (global == null) {
 			return;
 		}
-
+		
 		globalIndexSpace = globalIndexSpace.concat(global.globals);
-		Console.log('There are ${globalIndexSpace.length} entries in the global index spaces.');
+		hex.log.HexLog.info('There are ${globalIndexSpace.length} entries in the global index spaces.');
 	}
 
 	/**
@@ -235,6 +245,7 @@ class Module {
 		// If present, extract the function names from the custom 'name' section
 		var names:NameMap = new NameMap();
 		var s = custom(CustomSectionName);
+		
 		if (s != null) {
 			var nSec:NameSection = new NameSection();
 			var bi = new BytesInput(s.data);
@@ -249,7 +260,7 @@ class Module {
 
 		// If available, fill in the name field for the imported functions
 		for (i in 0...functionIndexSpace.length) {
-			functionIndexSpace[i].name = names[i];
+			functionIndexSpace[i].name = names[cast(i, U32)];
 		}
 
 		// Add the functions from the wasm itself to the function list
@@ -261,7 +272,7 @@ class Module {
 				throw err;
 			}
 			// Create the main function structure
-			var fn = new Function(types.entries[typeIndex], code.bodies[codeIndex], names[codeIndex + numImports]);
+			var fn = new Function(types.entries[typeIndex], code.bodies[codeIndex], names[cast(codeIndex + numImports, U32)]);
 			functionIndexSpace.push(fn);
 		}
 
@@ -336,7 +347,7 @@ class Module {
 			}
 		}
 
-		Console.log('There are ${tableIndexSpace.length} entries in the table index space.');
+		hex.log.HexLog.info('There are ${tableIndexSpace.length} entries in the table index space.');
 	}
 
 	public function populateLinearMemory() {

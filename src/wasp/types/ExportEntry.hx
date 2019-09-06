@@ -12,6 +12,7 @@ class ExportEntry implements Marshaller {
 	public var index:Int;
 
 	public function new() {
+		this.kind = new External();
 	}
 
 	public function fromWasm(r:BytesInput) {

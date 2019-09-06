@@ -12,7 +12,7 @@ class Data extends RawSection{
         // super.readPayload(r);
         var count = Leb128.readUint32(r);
         entries = [];
-        for(i in 0...count){
+        for(i in 0...cast(count, Int)){
             var entry = new DataSegment();
             entry.fromWasm(r);
             entries.push(entry);

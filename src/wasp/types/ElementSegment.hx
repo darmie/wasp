@@ -2,6 +2,7 @@ package wasp.types;
 
 import haxe.io.*;
 import binary128.internal.Leb128;
+import wasp.Global.*;
 /**
  * describes a group of repeated elements that begin at a specified offset
  */
@@ -24,11 +25,11 @@ class ElementSegment implements Marshaller {
 
 	public function fromWasm(r:BytesInput) {
 		index = Leb128.readUint32(r);
-		offset = Module.readInitExpr(r);
+		offset = readInitExpr(r);
 
 		var numElems = Leb128.readUint32(r);
         
-		for(i in 0...numElems){
+		for(i in 0...cast(numElems, Int)){
 			var e = Leb128.readUint32(r);
 			elems.push(e);
 		}

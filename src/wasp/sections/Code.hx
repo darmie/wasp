@@ -3,6 +3,7 @@ package wasp.sections;
 import haxe.io.*;
 import binary128.internal.Leb128;
 import wasp.types.*;
+import hex.log.HexLog.*;
 
 /**
  * describes the body for every function declared inside a module.
@@ -18,10 +19,10 @@ class Code extends RawSection {
         // super.readPayload(r);
         var count = Leb128.readUint32(r);
         this.bodies = new Array<FunctionBody>();
-        Console.println('$count function bodies');
+        info('$count function bodies');
         
-        for(i in 0...count){
-            Console.println('Reading function $i');
+        for(i in 0...cast(count, Int)){
+            info('Reading function $i');
             var body:FunctionBody = new FunctionBody();
             body.fromWasm(r);
             this.bodies.push(body);

@@ -16,7 +16,7 @@ class GlobalEntry implements Marshaller {
     public var type:GlobalVar;
 
     public function new() {
-        
+        type = new GlobalVar();
     }
 
     public function fromWasm(r:BytesInput) {

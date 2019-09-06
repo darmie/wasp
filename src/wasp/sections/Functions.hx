@@ -8,7 +8,7 @@ class Functions extends RawSection {
     /**
      * Sequences of indices into (FunctionSignatues).Entries
      */
-    public var types:Array<Int>;
+    public var types:Array<Int> = [];
 
     override function sectionID():SectionID {
         return SectionIDFunction;
@@ -16,7 +16,7 @@ class Functions extends RawSection {
 
     override function readPayload(r:BytesInput) {
         var count = Leb128.readUint32(r);
-        for(i in 0...count){
+        for(i in 0...cast(count, Int)){
             var type = Leb128.readUint32(r);
             types.push(type);
         }

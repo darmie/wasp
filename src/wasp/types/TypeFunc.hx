@@ -5,9 +5,13 @@ import haxe.io.*;
 /**
  * represents the value type of a function
  */
-abstract TypeFunc(Int) from Int to Int {
+abstract TypeFunc(Int){
     public inline function new() {
         this = 0x60;
+    }
+
+    @:to public inline function toInt():Int {
+        return 0x60;
     }  
 
     public function toWasm(w:BytesOutput) {

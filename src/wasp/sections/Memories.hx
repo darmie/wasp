@@ -14,7 +14,7 @@ class Memories extends RawSection {
 
     override function readPayload(r:BytesInput) {
         var count = Leb128.readUint32(r);
-        for(i in 0...count){
+        for(i in 0...cast(count, Int)){
             var entry = new Memory();
             entry.fromWasm(r);
             entries.push(entry);

@@ -3,6 +3,7 @@ package wasp.operators;
 import haxe.io.BytesBuffer;
 import haxe.io.BytesOutput;
 import wasp.types.ValueType;
+import wasp.types.BlockType;
 import wasp.Global.*;
 
 class Op {
@@ -11,6 +12,10 @@ class Op {
 
 	// The name of the operator
 	public var name:String;
+
+	public static var NativeExec = Op.init(0xfe, "nativeExec", [ValueTypeI64], cast BlockTypeEmpty);
+
+    public static var internalOpcodes:Map<Int, Bool> = [NativeExec => true];
 
 	/**
 	 * Whether this operator is polymorphic.
@@ -23,8 +28,8 @@ class Op {
 
 	public var returns:ValueType;
 
-	private function new(code:Int) {
-		this.code = code;
+	public function new() {
+		args = [];
 	}
 
 	public static function New(code:Int) {
@@ -36,7 +41,7 @@ class Op {
 		}
 
 		var op = ops[code];
-		if(!op.isValid()){
+		if(!(op.name != "") && ops.get(code) != null){
 			throw 'Invalid opcode: 0x${buf.getBytes().toHex()}';
 		}
 
@@ -60,19 +65,20 @@ class Op {
 	// }
 
 	public static function init(code:Int, name:String, args:Array<ValueType>, returns:ValueType) {
-		if (ops[code].isValid()) {
-			var buf = new BytesOutput();
-			buf.writeByte(code);
-			throw 'Opcode 0x${buf.getBytes().toHex()} is already assigned to ${ops[code].name}';
-		}
 
-		var op = new Op(code);
-		// op.code = code;
+		var op = new Op();
+		op.code = code;
 		op.name = name;
 		op.args = args;
 		op.returns = returns;
 
 		op.polymorphic = false;
+		
+		if (name != "" && ops.get(code) != null) {
+			var buf = new BytesOutput();
+			buf.writeByte(code);
+			throw 'Opcode 0x${buf.getBytes().toHex()} is already assigned to ${ops[code].name}';
+		}
 
 		ops[code] = op;
 
@@ -80,17 +86,17 @@ class Op {
 	}
 
 	public static function initPolymorphic(code:Int, name:String):Int {
-		if (ops[code].isValid()) {
+		var op = new Op();
+		op.code = code;
+		op.name = name;
+
+		op.polymorphic = false;
+
+		if (name != "" && ops.get(code) != null) {
 			var buf = new BytesOutput();
 			buf.writeByte(code);
 			throw 'Opcode 0x${buf.getBytes().toHex()} is already assigned to ${ops[code].name}';
 		}
-
-		var op = new Op(code);
-		// op.code = code;
-		op.name = name;
-
-		op.polymorphic = false;
 
 		ops[code] = op;
 

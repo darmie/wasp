@@ -1,11 +1,7 @@
 package wasp.exceptions;
 
-abstract InvalidInitExprOpError(Int) {
+abstract InvalidInitExprOpError(String) {
     public inline function new(i:Int) {
-        this = i;
-    }
-
-    public inline function toString() {
-       return 'wasm: Invalid opcode in initializer expression: ${StringTools.hex(this)}';
+        this = 'wasm: Invalid opcode in initializer expression: 0x${StringTools.hex(i)}';
     }
 }

@@ -14,29 +14,29 @@ class LittleEndian {
 		b.set(0, v);
 		b.set(1, v >> 8);
 	}
-	public static function Uint32(b:Bytes):Int {
+	public static function Uint32(b:Bytes):U32 {
 		return b.get(0) | b.get(1) << 8 | b.get(2) << 16 | b.get(3) << 24;
 	}
 
-	public static function PutUint32(b:BytesOutput, v:Int) {
+	public static function PutUint32(b:BytesOutput, v:U32) {
 		b.writeByte(v >> 24);
 		b.writeByte(v >> 16);
 		b.writeByte(v >> 8);
 		b.writeByte(v);
 	}
 
-	public static function Uint64(b:Bytes):Int {
+	public static function Uint64(b:Bytes):U64 {
 		return b.get(0) | b.get(1) << 8 | b.get(2) << 16 | b.get(3) << 24 | b.get(4) << 32 | b.get(5) << 40 | b.get(6) << 48 | b.get(7) << 56;
 	}
 
-	public static function PutUint64(b:BytesOutput, v:Int) {
-		b.writeByte(v);
-		b.writeByte(v >> 8);
-		b.writeByte(v >> 16);
-		b.writeByte(v >> 24);
-		b.writeByte(v >> 32);
-		b.writeByte(v >> 40);
-		b.writeByte(v >> 48);
-		b.writeByte(v >> 56);
+	public static function PutUint64(b:BytesOutput, v:U64) {
+		b.writeByte(cast v);
+		b.writeByte(cast(v >> 8));
+		b.writeByte(cast(v >> 16));
+		b.writeByte(cast(v >> 24));
+		b.writeByte(cast(v >> 32));
+		b.writeByte(cast(v >> 40));
+		b.writeByte(cast(v >> 48));
+		b.writeByte(cast(v >> 56));
 	}
 }

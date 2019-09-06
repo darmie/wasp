@@ -3,6 +3,7 @@ package wasp.types;
 import binary128.internal.Leb128;
 import haxe.io.*;
 import wasp.io.*;
+import wasp.Global.*;
 
 /**
  * Describes the signature of a declared function in a WASM module
@@ -46,14 +47,15 @@ class FunctionSig implements Marshaller {
         var form = Read.byte(r);
         var buf = new BytesBuffer();
         buf.addByte(form);
-        if(form != cast TypeFunc){
-            throw 'wasm: unknown function form: ${buf.getBytes().toHex()}';
+        if(form != 0x60){
+            throw 'wasm: unknown function form: 0x${buf.getBytes().toHex()}';
         }
-
+        
         this.form = form;
+        
         var paramCount = Leb128.readUint32(r);
         paramTypes = [];
-        for(i in 0...paramCount){
+        for(i in 0...getInitialCap(cast(paramCount, Int))){
             var v = new ValueType();
             v.fromWasm(r);
             paramTypes.push(v);
@@ -61,7 +63,7 @@ class FunctionSig implements Marshaller {
 
         var returnCount = Leb128.readUint32(r);
         returnTypes = [];
-        for(i in 0...returnCount){
+        for(i in 0...getInitialCap(cast(returnCount, Int))){
             var v = new ValueType();
             v.fromWasm(r);
             returnTypes.push(v);

@@ -410,7 +410,9 @@ class Disassembly {
 
 		while (true) {
 			var op = reader.readByte();
+			
 			var opStr = Op.New(op);
+			
 			var instr:Instr = {
 				op: opStr,
 				immediates: []
@@ -431,7 +433,7 @@ class Disassembly {
 					{
 						var targetCount = Leb128.readUint32(reader);
 						instr.immediates.push(targetCount);
-						for (i in 0...targetCount) {
+						for (i in 0...cast(targetCount, Int)) {
 							var entry = Leb128.readUint32(reader);
 							instr.immediates.push(entry);
 						}
@@ -477,7 +479,7 @@ class Disassembly {
 					{
 						var b = Bytes.alloc(8);
 						reader.readFullBytes(b, 0, 8);
-						var i = haxe.Int64.ofInt(LittleEndian.Uint64(b));
+						var i:I64 = cast LittleEndian.Uint64(b);
 						instr.immediates.push(FPHelper.i64ToDouble(i.low, i.high));
 					}
 				case I32Load | I64Load | F32Load | F64Load | I32Load8s | I32Load8u | I32Load16s | I32Load16u | I64Load8s | I64Load8u | I64Load16s | I64Load16u | I64Load32s | I64Load32u | I32Store | I64Store | F32Store | F64Store | I32Store8 | I32Store16 | I64Store8 | I64Store16 | I64Store32:

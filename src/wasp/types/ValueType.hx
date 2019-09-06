@@ -1,7 +1,7 @@
 package wasp.types;
 
 enum abstract ValueType(Int) from Int to Int {
-	public inline function new(){}
+	public inline function new(){this = 0;}
 
 	var ValueTypeI32 = 0x7f;
 	var ValueTypeI64 = 0x7e;

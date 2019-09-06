@@ -5,6 +5,8 @@ import haxe.io.BytesInput;
 import haxe.io.BytesOutput;
 
 enum abstract External(Int) from Int to Int {
+	public inline function new() this = 0;
+
 	var ExternalFunction = 0;
 	var ExternalTable = 1;
 	var ExternalMemory = 2;

@@ -3,6 +3,7 @@ package wasp.sections;
 import wasp.types.*;
 import haxe.io.*;
 import binary128.internal.Leb128;
+import wasp.Global.*;
 
 class SectionTypes extends RawSection {
     public var entries:Array<FunctionSig>;
@@ -14,8 +15,8 @@ class SectionTypes extends RawSection {
     override function readPayload(r:BytesInput) {
         var count = Leb128.readUint32(r);
         entries = [];
-
-        for(i in 0...count){
+       
+        for(i in 0...getInitialCap(cast(count, Int))){
             var sig = new FunctionSig();
             sig.fromWasm(r);
             entries.push(sig);

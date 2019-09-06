@@ -8,9 +8,9 @@ import binary128.internal.Leb128;
 /**
  * maps an index of the entry to a name.
  */
-abstract NameMap(Map<Int, String>) to  Map<Int, String>{
+abstract NameMap(Map<U32, String>) to  Map<U32, String>{
     public inline function new(){
-        this = new Map<Int, String>();
+        this = new Map<U32, String>();
     }
 
     @:arrayAccess public inline function get(key:Int):String {
@@ -40,7 +40,7 @@ abstract NameMap(Map<Int, String>) to  Map<Int, String>{
 
     public function fromWasm(r:BytesInput):Void {
         var size = Leb128.readUint32(r);
-        for(i in 0...size){
+        for(i in 0...cast(size, Int)){
             var ind = Leb128.readUint32(r);
             var name = Read.UTF8StringUint(r);
             this.set(ind, name);

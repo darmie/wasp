@@ -11,8 +11,7 @@ import wasp.types.ExportEntry;
  */
 class Exports extends RawSection {
     public var entries:Map<String, ExportEntry>;
-    public var names:Array<String>;
-
+    public var names:Array<String> = [];
 
     override function sectionID():SectionID {
         return SectionIDExport;
@@ -22,9 +21,10 @@ class Exports extends RawSection {
         var count = Leb128.readUint32(r);
         entries = [];
 
-        for(i in 0...count){
+        for(i in 0...cast(count, Int)){
             var entry = new ExportEntry();
             entry.fromWasm(r);
+            
             if(entries.exists(entry.fieldStr)){
                 throw 'Duplicate export entry: ${entry.fieldStr}';
             }

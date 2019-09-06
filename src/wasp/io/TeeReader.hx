@@ -14,7 +14,6 @@ class TeeReader extends BytesInput {
 		if (n > 0) {
 			n = writer.writeBytes(p, 0, n);
 		}
-
 		return n;
 	}
 }

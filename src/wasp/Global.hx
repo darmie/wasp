@@ -1,31 +1,27 @@
 package wasp;
 
+import haxe.ds.Vector;
 import haxe.io.*;
 import wasp.io.*;
 import wasp.types.*;
 import wasp.exceptions.*;
 import binary128.internal.Leb128;
-
 import wasp.Module;
 import wasp.operators.Op;
 import wasp.types.ValueType;
 import wasp.types.BlockType;
 
 class Global {
-    public static inline var Magic:Int = 0x6d736100;
+	public static var Version:U32 = 0x1;
 
-    public static var ops:Array<Op> = [];
+	public static var Magic:U32 = 0x6d736100;
 
-    public static var internalOpcodes:Map<Int, Bool> = [
-        NativeExec => true
-    ];
+	public static var ops:Vector<Op> = new Vector(256);
 
-    public static var NativeExec = Op.init(0xfe, "nativeExec", [ValueTypeI64], cast BlockTypeEmpty);
-
-    // to avoid memory attack
+	// to avoid memory attack
 	private static inline var maxInitialCap = 10 * 1024;
-	public static function getInitialCap(count:Int) {
 
+	public static function getInitialCap(count:Int) {
 		if (count > maxInitialCap) {
 			return maxInitialCap;
 		}
@@ -42,49 +38,55 @@ class Global {
 	public static inline var end = 0x0b;
 
 
+	// public static function __init__() {
+	// 	for(op in ops){
+	// 		op = new Op();
+	// 	}
+	// }
 
-    public static function readInitExpr(r:BytesInput):Bytes {
+	public static function readInitExpr(r:BytesInput):Bytes {
 		var b = Bytes.alloc(1);
 		var buf = new BytesOutput();
-		r = new TeeReader(r, buf);
-		var recur = function():Bytes {
-			return null;
-		};
 
-		recur = () -> {
-			while (true) {
-				r.readFullBytes(b, 0, b.length);
-				switch b.get(0) {
-					case i32Const: {
-							Leb128.readUint32(r);
-						}
-					case i64Const: {
-							Leb128.readUint64(r);
-						}
-					case f32Const: {
-							Read.U32(r);
-						}
-					case f64Const: {
-							Read.U64(r);
-						}
-					case getGlobal: {
-							Leb128.readUint32(r);
-						}
-					case end: {
-							return recur();
-						}
-					default: {
-							throw new InvalidInitExprOpError(b.get(0));
-						}
-				}
+		while (true) {
+			var _b = r.readByte();
+			switch _b {
+				case i32Const:
+					{
+						buf.writeInt32(Leb128.readInt32(r));
+					}
+				case i64Const:
+					{
+						var v = Leb128.readInt64(r);
+						buf.writeDouble(FPHelper.i64ToDouble(v.low, v.high));
+					}
+				case f32Const:
+					{
+						LittleEndian.PutUint32(buf, Read.U32(r));
+					}
+				case f64Const:
+					{
+						LittleEndian.PutUint64(buf, Read.U64(r));
+					}
+				case getGlobal:
+					{
+						LittleEndian.PutUint32(buf, Leb128.readUint32(r));
+					}
+				case end:
+					{
+						break;
+					}
+				default:
+					{
+						throw new InvalidInitExprOpError(_b);
+					}
 			}
-			if (buf.length == 0) {
-				throw new ErrorEmptyInitExpr();
-			}
-
-			return buf.getBytes();
 		}
-		return recur();
+		if (buf.length == 0) {
+			throw new ErrorEmptyInitExpr();
+		}
+
+		return buf.getBytes();
 	}
 
 	/**
@@ -96,8 +98,8 @@ class Global {
 	 * @return Dynamic
 	 */
 	public static function execInitExpr(module:Module, expr:Bytes):Dynamic {
-		var stack = [];
-		var lastVal:ValueType = null;
+		var stack:Array<U64> = [];
+		var lastVal:ValueType = -1;
 		var r = new BytesInput(expr);
 
 		if (r.length == 0) {
@@ -110,25 +112,25 @@ class Global {
 				case i32Const:
 					{
 						var i = Leb128.readInt32(r);
-						stack.push(i);
+						stack.push(cast i);
 						lastVal = ValueTypeI32;
 					}
 				case i64Const:
 					{
 						var i = Leb128.readInt64(r);
-						stack.push(i);
+						stack.push(cast i);
 						lastVal = ValueTypeI64;
 					}
 				case f32Const:
 					{
 						var i = Read.U32(r);
-						stack.push(i);
+						stack.push(cast i);
 						lastVal = ValueTypeF32;
 					}
 				case f64Const:
 					{
 						var i = Read.U64(r);
-						stack.push(i);
+						stack.push(cast i);
 						lastVal = ValueTypeF64;
 					}
 				case getGlobal:
@@ -165,7 +167,7 @@ class Global {
 				}
 			case ValueTypeI64:
 				{
-					return haxe.Int64.ofInt(v);
+					return v;
 				}
 			case ValueTypeF32 | ValueTypeF64:
 				{

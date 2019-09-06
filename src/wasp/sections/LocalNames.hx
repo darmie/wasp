@@ -36,7 +36,7 @@ class LocalNames implements NameSubSection {
     public function fromWasm(r:BytesInput):Void {
         funcs = new Map<Int, NameMap>();
         var size = Leb128.readUint32(r);
-        for(i in 0...size){
+        for(i in 0...cast(size, Int)){
             var ind = Leb128.readUint32(r);
             var m = new NameMap();
             m.fromWasm(r);

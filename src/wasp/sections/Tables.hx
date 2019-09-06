@@ -17,7 +17,7 @@ class Tables extends RawSection {
         var count = Leb128.readUint32(r);
         entries = [];
 
-        for(i in 0...count){
+        for(i in 0...cast(count, Int)){
             var entry = new Table();
             entry.fromWasm(r);
             entries.push(entry);

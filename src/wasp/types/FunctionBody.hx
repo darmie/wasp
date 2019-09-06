@@ -23,15 +23,15 @@ class FunctionBody {
         locals = [];
         // locals.resize(Constants.getInitialCap(localCount));
 
-        for(i in 0...localCount){
+        for(i in 0...cast(localCount, Int)){
             var local:LocalEntry = new LocalEntry();
             local.fromWasm(bytesReader);
             locals.push(local);
         }
 
-        Console.log('bodySize: $bodySize, localCount: ${localCount}\n');
+        hex.log.HexLog.info('bodySize: $bodySize, localCount: ${localCount}\n');
         var code = bytesReader.readAll();
-        Console.log('Read ${code.length} bytes for function body');
+        hex.log.HexLog.info('Read ${code.length} bytes for function body');
 
         if(code.get(code.length - 1) != end){
             throw "Function body does not end with 0x0b (end)";

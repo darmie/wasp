@@ -16,7 +16,7 @@ class SectionsReader {
 		m = _m;
 	}
 
-	public function readSections(r:ReadPos) {
+	public function readSections(r:BytesInput) {
 		while (true) {
 			var done = readSection(r);
 			if (done)
@@ -24,11 +24,10 @@ class SectionsReader {
 		}
 	}
 
-	public function readSection(r:ReadPos):Bool {
+	public function readSection(r:BytesInput):Bool {
 		try {
 			var m = this.m;
-
-			Console.log("Reading section ID");
+			hex.log.HexLog.info("Reading section ID");
 			var id = r.readByte();
 
 			if (id != SectionIDCustom) {
@@ -42,102 +41,103 @@ class SectionsReader {
 			var s = new RawSection();
 			s.id = id;
 
-			Console.log("Reading payload length");
+			hex.log.HexLog.info("Reading payload length");
 
 			var payloadDataLen = Leb128.readUint32(r);
 
-			Console.log('Section payload length: $payloadDataLen');
-
-			s.start = r.curPos;
-
-			var sectionBytes = new BytesOutput();
-
-			var sectionReder = new LimitReader(new TeeReader(r, sectionBytes), payloadDataLen);
+			hex.log.HexLog.info('Section payload length: $payloadDataLen');
+		
+			s.start = r.position;
+			var sectionBytes = Bytes.alloc(payloadDataLen);
+			r.readFullBytes(sectionBytes, 0, payloadDataLen);
+			var sectionReader = new BytesInput(sectionBytes); //new LimitReader(new TeeReader(r, sectionBytes), payloadDataLen);
+		
 
 			var sec:Section = null;
-
 			switch s.id {
 				case SectionIDCustom:
 					{
-						Console.log("section custom");
+						hex.log.HexLog.info("section custom");
 						var cs = new Custom();
 						m.customs.push(cs);
 						sec = cs;
 					}
 				case SectionIDType:
 					{
-						Console.log("section type");
+						hex.log.HexLog.info("section type");
 						m.types = new SectionTypes();
 						sec = m.types;
 					}
 				case SectionIDImport:
 					{
-						Console.log("section import");
+						hex.log.HexLog.info("section import");
 						m.import_ = new Imports();
 						sec = m.import_;
 					}
 				case SectionIDFunction:
 					{
-						Console.log("section function");
+						hex.log.HexLog.info("section function");
 						m.function_ = new Functions();
 						sec = m.function_;
 					}
 				case SectionIDTable:
 					{
-						Console.log("section table");
+						hex.log.HexLog.info("section table");
 						m.table = new Tables();
 						sec = m.table;
 					}
 				case SectionIDMemory:
 					{
-						Console.log("section memory");
+						hex.log.HexLog.info("section memory");
 						m.memory = new Memories();
 						sec = m.memory;
 					}
 				case SectionIDGlobal:
 					{
-						Console.log("section global");
+						hex.log.HexLog.info("section global");
 						m.global = new Globals();
 						sec = m.global;
 					}
 				case SectionIDExport:
 					{
-						Console.log("section export");
+						hex.log.HexLog.info("section export");
 						m.export = new Exports();
 						sec = m.export;
 					}
 				case SectionIDStart:
 					{
-						Console.log("section start");
+						hex.log.HexLog.info("section start");
 						m.start = new StartFunction();
 						sec = m.start;
 					}
 				case SectionIDElement:
 					{
-						Console.log("section element");
+						hex.log.HexLog.info("section element");
 						m.elements = new Elements();
 						sec = m.elements;
 					}
 				case SectionIDCode:
 					{
-						Console.log("section code");
+						hex.log.HexLog.info("section code");
 						m.code = new Code();
 						sec = m.code;
 					}
 				case SectionIDData:
 					{
-						Console.log("section data");
+						hex.log.HexLog.info("section data");
 						m.data = new Data();
 						sec = m.data;
 					}
 				default:
 					throw new InvalidSectionIDError(s.id);
 			}
-
-			sec.readPayload(sectionReder);
-			s.end = r.curPos;
-			s.bytes = sectionBytes.getBytes();
-
+			
+			sec.readPayload(sectionReader);
+		
+			s.end = r.position;
+			s.bytes = sectionBytes;
+			
+			sec = s;
 			switch s.id {
 				case SectionIDCode:
 					{
@@ -160,12 +160,11 @@ class SectionsReader {
 					}
 				case _:
 			}
-
+			
 			m.sections.push(sec);
-
 			return false;
 		} catch (e:haxe.io.Eof) {
-                return false;
+                return true;
         }
 	}
 }
