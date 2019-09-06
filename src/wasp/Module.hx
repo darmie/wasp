@@ -277,14 +277,14 @@ class Module {
 	 * @param i
 	 * @return Function
 	 */
-	public function getFunction(i:Int):Function {
+	public function getFunction(i):Function {
 		if (i >= functionIndexSpace.length || i < 0) {
 			return null;
 		}
 		return functionIndexSpace[i];
 	}
 
-	public function getGlobal(i:Int):GlobalEntry {
+	public function getGlobal(i):GlobalEntry {
 		if (i >= globalIndexSpace.length || i < 0) {
 			return null;
 		}

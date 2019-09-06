@@ -134,9 +134,9 @@ class Global {
 				case getGlobal:
 					{
 						var i = Leb128.readInt32(r);
-						var globalVar = module.getGlobal(i);
+						var globalVar = module.getGlobal(cast i);
 						if (globalVar == null) {
-							throw new InvalidGlobalIndexError(i);
+							throw new InvalidGlobalIndexError(cast i);
 						}
 						lastVal = globalVar.type.type;
 					}

@@ -10,7 +10,7 @@ class LimitReader extends  BytesInput {
      * max bytes remaining
      */
     var N:Int;
-    public function new(r:BytesInput, n:Int) {
+    public function new(r:BytesInput, n) {
         super(r.readAll());
         N = n;
     }

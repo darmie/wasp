@@ -1,6 +1,7 @@
 package wasp.types;
 
 import haxe.io.*;
+import wasp.Global.*;
 
 class GlobalEntry implements Marshaller {
 
@@ -22,7 +23,7 @@ class GlobalEntry implements Marshaller {
         type.fromWasm(r);
 
         // init_expr is delimited by opcode "end" (0x0b)
-        init = Module.readInitExpr(r);
+        init = readInitExpr(r);
     }
 
     public function toWasm(w:BytesOutput) {

@@ -1,7 +1,9 @@
--main Main
+-main Test
 -cp src/
 -cp binary128/src/
 
 -lib hexlog
 -lib console.hx
 # -js bin/Wasp.js
+
+-cs bin/wasp/bin/cs
