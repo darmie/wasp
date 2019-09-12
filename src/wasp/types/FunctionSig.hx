@@ -25,7 +25,7 @@ class FunctionSig implements Marshaller {
         
     }
     public function toString() {
-        return '<func ${paramTypes} -> ${returnTypes}>';
+        return '<func ${[for (_p in paramTypes) _p.toString()]} -> ${[for (_r in returnTypes) _r.toString()]}>';
     }
 
 

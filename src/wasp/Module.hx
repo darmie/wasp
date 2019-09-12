@@ -18,7 +18,7 @@ import binary128.internal.Leb128;
 typedef ResolveFunc = (name:String) -> Module;
 
 typedef ImportsT = {
-	?funcs:Array<Int>,
+	?funcs:Array<U32>,
 	?globals:Int,
 	?tables:Int,
 	?memories:Int
@@ -30,7 +30,7 @@ class Module {
 	public var functionIndexSpace:Array<Function>;
 	public var globalIndexSpace:Array<GlobalEntry>;
 
-	public var tableIndexSpace:Array<Array<Int>>;
+	public var tableIndexSpace:Array<Array<U32>>;
 
 	public var linearMemoryIndexSpace:Array<Bytes>;
 
@@ -103,11 +103,11 @@ class Module {
 		var m = decode(r);
 		m.linearMemoryIndexSpace = [];
 		if (m.table != null) {
-			m.tableIndexSpace = new Array<Array<Int>>();
+			m.tableIndexSpace = new Array<Array<U32>>();
 		}
 		if (m.import_ != null) {
 			if (m.code == null) {
-				m.code = new Code();
+				m.code = new Code(m);
 			}
 			m.resolveImports(resolvePath);
 		}
@@ -267,12 +267,12 @@ class Module {
 		var numImports = functionIndexSpace.length;
 		for (codeIndex in 0...function_.types.length) {
 			var typeIndex = function_.types[codeIndex];
-			if (typeIndex >= types.entries.length) {
+			if (cast(typeIndex, Int) >= types.entries.length) {
 				var err:InvalidFunctionIndexError = typeIndex;
 				throw err;
 			}
 			// Create the main function structure
-			var fn = new Function(types.entries[typeIndex], code.bodies[codeIndex], names[cast(codeIndex + numImports, U32)]);
+			var fn = new Function(types.entries[cast typeIndex], code.bodies[codeIndex], names[cast(codeIndex + numImports, U32)]);
 			functionIndexSpace.push(fn);
 		}
 
@@ -309,7 +309,7 @@ class Module {
 
 		for (elem in elements.entries) {
 			// the MVP dictates that index should always be zero, we should probably check this
-			if (elem.index >= tableIndexSpace.length) {
+			if (cast(elem.index, Int) >= tableIndexSpace.length) {
 				var err:InvalidTableIndexError = cast elem.index;
 				throw err;
 			}
@@ -323,9 +323,9 @@ class Module {
 			} catch (e:Dynamic) {
 				throw new InvalidValueTypeInitExprError(TInt, Type.typeof(val));
 			}
-			var table = tableIndexSpace[elem.index];
+			var table = tableIndexSpace[cast elem.index];
 			if (offset + elem.elems.length > table.length) {
-				var data = new haxe.ds.Vector<Int>(offset + elem.elems.length).toArray();
+				var data = new haxe.ds.Vector<U32>(offset + elem.elems.length).toArray();
 				var off = offset;
 				for (e in elem.elems) {
 					data.insert(off, e);
@@ -337,7 +337,7 @@ class Module {
 					i++;
 				}
 
-				tableIndexSpace[elem.index] = data;
+				tableIndexSpace[cast(elem.index, Int)] = data;
 			} else {
 				for (i in offset...elem.elems.length) {
 					for (e in elem.elems) {

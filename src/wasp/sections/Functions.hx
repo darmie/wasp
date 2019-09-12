@@ -8,7 +8,7 @@ class Functions extends RawSection {
     /**
      * Sequences of indices into (FunctionSignatues).Entries
      */
-    public var types:Array<Int> = [];
+    public var types:Array<U32> = [];
 
     override function sectionID():SectionID {
         return SectionIDFunction;

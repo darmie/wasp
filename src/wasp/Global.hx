@@ -1,5 +1,6 @@
 package wasp;
 
+import haxe.Int64;
 import haxe.ds.Vector;
 import haxe.io.*;
 import wasp.io.*;
@@ -61,12 +62,16 @@ class Global {
 						buf.writeDouble(FPHelper.i64ToDouble(v.low, v.high));
 					}
 				case f32Const:
-					{
-						LittleEndian.PutUint32(buf, Read.U32(r));
+					{	
+						var v = Read.U32(r);
+						buf.writeFloat(FPHelper.i32ToFloat(v.toI32()));
 					}
 				case f64Const:
 					{
-						LittleEndian.PutUint64(buf, Read.U64(r));
+						// Todo: Make this accurate!
+						var v = Read.U64(r);
+						buf.writeDouble(v);
+						
 					}
 				case getGlobal:
 					{

@@ -12,7 +12,9 @@ class FunctionBody {
 
     public var code:Bytes;
 
-    public function new() {}
+    public function new(module:Module) {
+        this.module = module;
+    }
 
     public function fromWasm(r:BytesInput) {
         var bodySize = Leb128.readUint32(r);

@@ -10,7 +10,7 @@ class ElementSegment implements Marshaller {
     /**
      * The index into the global table space, should always be 0 in the MVP.
      */
-    public var index:Int;
+    public var index:U32;
 
 	/**
 	 * initializer expression for computing the offset for placing elements, should return an i32 value

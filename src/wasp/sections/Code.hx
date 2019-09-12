@@ -11,6 +11,13 @@ import hex.log.HexLog.*;
 class Code extends RawSection {
     public var bodies:Array<FunctionBody>;
 
+    private var module:Module;
+
+    public function new(module:Module) {
+        super();
+        this.module = module;
+    }
+
     override function sectionID():SectionID {
         return SectionIDCode;
     }
@@ -23,7 +30,7 @@ class Code extends RawSection {
         
         for(i in 0...cast(count, Int)){
             info('Reading function $i');
-            var body:FunctionBody = new FunctionBody();
+            var body:FunctionBody = new FunctionBody(this.module);
             body.fromWasm(r);
             this.bodies.push(body);
         } 

@@ -119,7 +119,7 @@ class SectionsReader {
 				case SectionIDCode:
 					{
 						hex.log.HexLog.info("section code");
-						m.code = new Code();
+						m.code = new Code(m);
 						sec = m.code;
 					}
 				case SectionIDData:

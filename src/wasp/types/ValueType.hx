@@ -14,8 +14,8 @@ enum abstract ValueType(Int) from Int to Int {
 		ValueTypeF64 => "f64"
 	];
 
-	public function toString() {
-		return stringMap.get(this);
+	@:to public function toString():String {
+		return '${stringMap.get(this)}';
 	}
 
 	public inline function fromWasm(input:haxe.io.Input) {
