@@ -1,5 +1,6 @@
 package wasp.disasm;
 
+import haxe.io.Eof;
 import haxe.io.BytesInput;
 import haxe.io.BytesOutput;
 import haxe.io.Bytes;
@@ -103,6 +104,7 @@ class Disassembly {
 	}
 
 	public function new(fn:Function, module:Module) {
+		this.code = [];
 		var code = fn.body.code;
 		var instrs = disassemble(code);
 
@@ -110,6 +112,7 @@ class Disassembly {
 		// polymorphic. Each block has its corresponding array. We start with one
 		// array for the root stack
 		var blockPolymorphicOps = new Array<Array<Int>>();
+		blockPolymorphicOps = [[]];
 
 		// a stack of current execution stack depth values, so that the depth for each
 		// stack is maintained independently for calculating discard values
@@ -146,6 +149,7 @@ class Disassembly {
 			if (!opStr.polymorphic && !instr.unreachable) {
 				var top = stackDepths.top();
 				top -= opStr.args.length;
+				
 				stackDepths.setTop(top);
 				if (top < -1) {
 					throw new ErrStackUnderflow();
@@ -404,105 +408,110 @@ class Disassembly {
 		#end
 	}
 
-	public function disassemble(code:Bytes):Array<Instr> {
+	public static function disassemble(code:Bytes):Array<Instr> {
 		var reader = new BytesInput(code);
 		var out:Array<Instr> = [];
 
 		while (true) {
-			var op = reader.readByte();
-			
-			var opStr = Op.New(op);
-			
-			var instr:Instr = {
-				op: opStr,
-				immediates: []
-			};
+			try {
+				var op:Ops = cast reader.readByte();
 
-			switch op {
-				case Block | Loop | If:
-					{
-						var sig:BlockType = Read.byte(reader);
-						instr.immediates.push(sig);
-					}
-				case Br | BrIf:
-					{
-						var depth = Leb128.readUint32(reader);
-						instr.immediates.push(depth);
-					}
-				case BrTable:
-					{
-						var targetCount = Leb128.readUint32(reader);
-						instr.immediates.push(targetCount);
-						for (i in 0...cast(targetCount, Int)) {
-							var entry = Leb128.readUint32(reader);
-							instr.immediates.push(entry);
+				var opStr = Op.New(op);
+
+				var instr:Instr = {
+					op: opStr,
+					immediates: []
+				};
+				switch op {
+					case Block | Loop | If:
+						{
+							var sig:BlockType = Read.byte(reader);
+							instr.immediates.push(sig);
 						}
-						var defaultTarget = Leb128.readUint32(reader);
-						instr.immediates.push(defaultTarget);
-					}
-				case Call | CallIndirect:
-					{
-						var index = Leb128.readUint32(reader);
-						instr.immediates.push(index);
-						if (op == CallIndirect) {
+					case Br | BrIf:
+						{
+							var depth = Leb128.readUint32(reader);
+							instr.immediates.push(depth);
+						}
+					case BrTable:
+						{
+							var targetCount = Leb128.readUint32(reader);
+							instr.immediates.push(targetCount);
+							for (i in 0...cast(targetCount, Int)) {
+								var entry = Leb128.readUint32(reader);
+								instr.immediates.push(entry);
+							}
+							var defaultTarget = Leb128.readUint32(reader);
+							instr.immediates.push(defaultTarget);
+						}
+					case Call | CallIndirect:
+						{
+							var index = Leb128.readUint32(reader);
+							instr.immediates.push(index);
+							if (op == CallIndirect) {
+								var idx = Read.byte(reader);
+								if (idx != 0x00) {
+									error("table index in call_indirect must be 0");
+									throw 'disasm: table index in call_indirect must be 0';
+								}
+								instr.immediates.push(idx);
+							}
+						}
+					case GetGlobal | GetLocal | TeeLocal | SetLocal | SetGlobal:
+						{
+							var index = Leb128.readUint32(reader);
+							instr.immediates.push(index);
+						}
+					case I32Const:
+						{
+							var i = Leb128.readUint32(reader);
+							instr.immediates.push(i);
+						}
+					case I64Const:
+						{
+							var i = Leb128.readUint64(reader);
+							instr.immediates.push(i);
+						}
+					case F32Const:
+						{
+							var b = Bytes.alloc(4);
+							reader.readFullBytes(b, 0, 4);
+							var i = LittleEndian.Uint32(b);
+							instr.immediates.push(FPHelper.i32ToFloat(i));
+						}
+					case F64Const:
+						{
+							var b = Bytes.alloc(8);
+							reader.readFullBytes(b, 0, 8);
+							var i:I64 = LittleEndian.Uint64(b);
+							instr.immediates.push(FPHelper.i64ToDouble(i.low, i.high));
+						}
+					case I32Load | I64Load | F32Load | F64Load | I32Load8s | I32Load8u | I32Load16s | I32Load16u | I64Load8s | I64Load8u | I64Load16s | I64Load16u | I64Load32s | I64Load32u | I32Store | I64Store | F32Store | F64Store | I32Store8 | I32Store16 | I64Store8 | I64Store16 | I64Store32:
+						{
+							// read memory_immediate
+							var align = Leb128.readUint32(reader);
+							instr.immediates.push(align);
+							var offset = Leb128.readUint32(reader);
+							instr.immediates.push(offset);
+						}
+					case CurrentMemory | GrowMemory:
+						{
 							var idx = Read.byte(reader);
 							if (idx != 0x00) {
-								error("table index in call_indirect must be 0");
-								throw 'disasm: table index in call_indirect must be 0';
+								error("memory index must be 0");
+								throw 'disasm: memory index must be 0';
 							}
 							instr.immediates.push(idx);
 						}
-					}
-				case GetGlobal | GetLocal | TeeLocal | SetLocal | SetGlobal:
-					{
-						var index = Leb128.readUint32(reader);
-						instr.immediates.push(index);
-					}
-				case I32Const:
-					{
-						var i = Leb128.readUint32(reader);
-						instr.immediates.push(i);
-					}
-				case I64Const:
-					{
-						var i = Leb128.readUint64(reader);
-						instr.immediates.push(i);
-					}
-				case F32Const:
-					{
-						var b = Bytes.alloc(4);
-						reader.readFullBytes(b, 0, 4);
-						var i = LittleEndian.Uint32(b);
-						instr.immediates.push(FPHelper.i32ToFloat(i));
-					}
-				case F64Const:
-					{
-						var b = Bytes.alloc(8);
-						reader.readFullBytes(b, 0, 8);
-						var i:I64 = cast LittleEndian.Uint64(b);
-						instr.immediates.push(FPHelper.i64ToDouble(i.low, i.high));
-					}
-				case I32Load | I64Load | F32Load | F64Load | I32Load8s | I32Load8u | I32Load16s | I32Load16u | I64Load8s | I64Load8u | I64Load16s | I64Load16u | I64Load32s | I64Load32u | I32Store | I64Store | F32Store | F64Store | I32Store8 | I32Store16 | I64Store8 | I64Store16 | I64Store32:
-					{
-						// read memory_immediate
-						var align = Leb128.readUint32(reader);
-						instr.immediates.push(align);
-						var offset = Leb128.readUint32(reader);
-						instr.immediates.push(offset);
-					}
-				case CurrentMemory | GrowMemory:
-					{
-						var idx = Read.byte(reader);
-						if (idx != 0x00) {
-							error("memory index must be 0");
-							throw 'disasm: memory index must be 0';
-						}
-						instr.immediates.push(idx);
-					}
+					case _:
+				}
+				out.push(instr);
+			} catch (e:Dynamic) {
+				if(Std.is(e, Eof)){
+					break;
+				}
 			}
-			out.push(instr);
 		}
-
 		return out;
 	}
 
@@ -586,10 +595,6 @@ class Disassembly {
  */
 abstract ErrStackUnderflow(String) {
 	public inline function new() {
-		this = "";
-	}
-
-	@:to public inline function toString():String {
-		return "disasm: stack underflow";
+		this = "disasm: stack underflow";
 	}
 }

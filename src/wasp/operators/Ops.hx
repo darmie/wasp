@@ -4,6 +4,7 @@ import wasp.types.BlockType;
 import wasp.types.ValueType;
 
 enum abstract Ops(Int) {
+
 	var I32Eqz;
 	var I32Eq;
 	var I32Ne;

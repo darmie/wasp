@@ -89,12 +89,7 @@ class Test {
 							for(body in m.code.bodies){
 								for (local in body.locals){
 									trace(local);
-								}	
-
-
-
-								
-
+								}
 							}
 						}
 						case SectionIDCustom:{
@@ -139,6 +134,12 @@ class Test {
 				sbuf.add(")"); // close
 			}
 			sbuf.add(")"); // close
+
+			var d = new Disassembly(func, func.body.module);
+
+			trace(d.code);
+
+			// trace(Disassembly.disassemble(func.body.code));
 		}
 	}
 

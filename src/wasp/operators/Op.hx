@@ -15,7 +15,7 @@ class Op {
 
 	public static var NativeExec = Op.init(0xfe, "nativeExec", [ValueTypeI64], cast BlockTypeEmpty);
 
-    public static var internalOpcodes:Map<Int, Bool> = [NativeExec => true];
+	public static var internalOpcodes:Map<Int, Bool> = [NativeExec => true];
 
 	/**
 	 * Whether this operator is polymorphic.
@@ -35,15 +35,17 @@ class Op {
 	public static function New(code:Int) {
 		var buf = new BytesBuffer();
 		buf.addByte(code);
-		
-		if(code >= ops.length || internalOpcodes[code]){
+
+		if (code >= ops.length || internalOpcodes[code]) {
 			throw 'Invalid opcode: 0x${buf.getBytes().toHex()}';
 		}
 
 		var op = ops[code];
-		if(!(op.name != "") && ops.get(code) != null){
+		if (!(op.name != "") && ops.get(code) != null) {
 			throw 'Invalid opcode: 0x${buf.getBytes().toHex()}';
 		}
+
+		op.args = [];
 
 		return op;
 	}
@@ -65,40 +67,39 @@ class Op {
 	// }
 
 	public static function init(code:Int, name:String, args:Array<ValueType>, returns:ValueType) {
-
-		var op = new Op();
-		op.code = code;
-		op.name = name;
-		op.args = args;
-		op.returns = returns;
-
-		op.polymorphic = false;
-		
 		if (name != "" && ops.get(code) != null) {
-			var buf = new BytesOutput();
-			buf.writeByte(code);
-			throw 'Opcode 0x${buf.getBytes().toHex()} is already assigned to ${ops[code].name}';
-		}
+			// var buf = new BytesOutput();
+			// buf.writeByte(code);
+			// throw 'Opcode 0x${buf.getBytes().toHex()} is already assigned to ${ops[code].name}';
+		} else {
+			var op = new Op();
+			op.code = code;
+			op.name = name;
+			op.args = args;
+			op.returns = returns;
 
-		ops[code] = op;
+			op.polymorphic = false;
+
+			ops[code] = op;
+		}
 
 		return code;
 	}
 
 	public static function initPolymorphic(code:Int, name:String):Int {
-		var op = new Op();
-		op.code = code;
-		op.name = name;
-
-		op.polymorphic = false;
-
 		if (name != "" && ops.get(code) != null) {
-			var buf = new BytesOutput();
-			buf.writeByte(code);
-			throw 'Opcode 0x${buf.getBytes().toHex()} is already assigned to ${ops[code].name}';
-		}
+			// var buf = new BytesOutput();
+			// buf.writeByte(code);
+			// throw 'Opcode 0x${buf.getBytes().toHex()} is already assigned to ${ops[code].name}';
+		} else {
+			var op = new Op();
+			op.code = code;
+			op.name = name;
 
-		ops[code] = op;
+			op.polymorphic = false;
+
+			ops[code] = op;
+		}
 
 		return code;
 	}
