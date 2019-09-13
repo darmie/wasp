@@ -64,13 +64,13 @@ class Global {
 				case f32Const:
 					{	
 						var v = Read.U32(r);
-						buf.writeFloat(FPHelper.i32ToFloat(v.toI32()));
+						buf.writeFloat(FPHelper.i32ToFloat(v));
 					}
 				case f64Const:
 					{
 						// Todo: Make this accurate!
 						var v = Read.U64(r);
-						buf.writeDouble(v);
+						buf.writeDouble(cast v);
 						
 					}
 				case getGlobal:

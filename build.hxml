@@ -4,10 +4,10 @@
 -cp binary128/numerix/src
 
 -lib hexlog
--lib console.hx
+
 #-js bin/Wasp.js
 -D debug
 
 -java bin/wasp/java
 
-# -cs bin/wasp/bin/cs
+#-cs bin/wasp/bin/cs
