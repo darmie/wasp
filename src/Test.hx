@@ -156,7 +156,7 @@ class Test {
 				case ValueTypeF64:
 					value = buf.readDouble();
 			}
-			sbuf.add('(global ;$index');
+			sbuf.add('(global ;$index ');
 			if (isExport) {
 				sbuf.add('(export "${export.fieldStr}") ');
 			}
