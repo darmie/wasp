@@ -142,6 +142,7 @@ class Test {
 
 	static function getGlobals(indexSpace:Array<GlobalEntry>, sbuf:StringBuf, isExport:Bool = false, export:ExportEntry = null) {
 		for (global in indexSpace) {
+			var index = indexSpace.indexOf(global);
 			var buf = new BytesInput(global.init);
 			var value:Dynamic = null;
 			var type = global.type.type;
@@ -155,7 +156,7 @@ class Test {
 				case ValueTypeF64:
 					value = buf.readDouble();
 			}
-			sbuf.add('(global ');
+			sbuf.add('(global ;$index');
 			if (isExport) {
 				sbuf.add('(export "${export.fieldStr}") ');
 			}
