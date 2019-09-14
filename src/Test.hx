@@ -17,29 +17,13 @@ import haxe.io.BytesInput;
 import sys.FileSystem;
 import sys.io.File;
 
-// private class ReadPosTest {
-// 	public function new(){
-// 		var data = new BytesOutput();
-// 		data.writeByte(0);
-// 		data.writeByte(1);
-// 		data.writeByte(2);
-// 		data.writeByte(3);
-// 		data.writeByte(4);
-// 		data.writeByte(5);
-// 		data.writeByte(6);
-// 		data.writeByte(7);
-// 		data.writeByte(8);
-// 		data.writeByte(9);
-// 		var r = new BytesInput(Bytes.alloc(0));
-// 		var reader:ReadPos = new ReadPos(r);
-// 		var b = Bytes.alloc(2);
-// 		var n = reader.readBytes(b);
-// 		trace('n == 0 : ${n} ${n == 0}');
-// 	}
-// }
+/**
+ * A simple Test class that dumps a disassembled wasm to text format.
+ * 
+ * PS: The text format is not the standard wat or wast format
+ */
 class Test {
 	public static function main() {
-		// new ReadPosTest();
 		new Test();
 	}
 
@@ -55,6 +39,16 @@ class Test {
 
 				var sbuf = new StringBuf();
 
+				sbuf.add("\n");
+
+				sbuf.add('###############################################\n');
+				sbuf.add('# Sample text representation of globals.wasm ##\n');
+				sbuf.add('###############################################\n');
+
+				sbuf.add("\n");
+
+				// start module
+				sbuf.add("(module \n");
 				for (section in m.sections) {
 					switch section.sectionID() {
 						case SectionIDGlobal:
@@ -64,6 +58,7 @@ class Test {
 						case SectionIDExport:
 							{
 								for (export in m.export.entries) {
+									sbuf.add('  ');
 									var exp:Dynamic = null;
 									switch export.kind {
 										case ExternalFunction: {
@@ -83,7 +78,7 @@ class Test {
 
 									sbuf.add('\n');
 								}
-								sbuf.add('\n');
+								// sbuf.add('\n');
 							}
 						case SectionIDCode: {
 							for(body in m.code.bodies){
@@ -105,6 +100,7 @@ class Test {
 						case _:
 					}
 				}
+				sbuf.add(")");
 				Sys.println(sbuf.toString());
 			}
 		} catch (e:Dynamic) {
@@ -135,13 +131,14 @@ class Test {
 			}
 			var d = new Disassembly(func, func.body.module);
 					
-			sbuf.add('${[for(c in d.code) '(${c.op.name} ${c.immediates.join(" ")})'].join(" ")}');
+			sbuf.add(' => ${[for(c in d.code) '(${c.op.name} ${c.immediates.join(" ")})'].join(" ")}');
 			sbuf.add(")"); // close
 		}
 	}
 
 	static function getGlobals(indexSpace:Array<GlobalEntry>, sbuf:StringBuf, isExport:Bool = false, export:ExportEntry = null) {
 		for (global in indexSpace) {
+			sbuf.add('  ');
 			var index = indexSpace.indexOf(global);
 			var buf = new BytesInput(global.init);
 			var value:Dynamic = null;
