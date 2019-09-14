@@ -133,13 +133,10 @@ class Test {
 				sbuf.add('result ${returns}');
 				sbuf.add(")"); // close
 			}
-			sbuf.add(")"); // close
-
 			var d = new Disassembly(func, func.body.module);
-
-			trace(d.code);
-
-			// trace(Disassembly.disassemble(func.body.code));
+					
+			sbuf.add('${[for(c in d.code) '(${c.op.name} ${c.immediates.join(" ")})'].join(" ")}');
+			sbuf.add(")"); // close
 		}
 	}
 

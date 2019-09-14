@@ -161,7 +161,7 @@ class Disassembly {
 
 				checkMaxDepth(top);
 			}
-
+			
 			switch op {
 				case Unreachable:
 					{
