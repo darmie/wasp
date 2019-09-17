@@ -8,7 +8,7 @@ class LocalEntry {
     /**
      *  The total number of local variables of the given Type used in the function body
      */
-    public var count:Int;
+    public var count:U32;
 
     /**
      * The type of value stored by the variable

@@ -3,7 +3,10 @@ package wasp.operators;
 import wasp.types.BlockType;
 import wasp.types.ValueType;
 
-enum abstract Ops(Int) {
+
+enum abstract Ops(Int){
+
+	// public inline function new(i:Int) this = i;
 
 	var I32Eqz = 0x45;
 	var I32Eq = 0x46;
@@ -179,8 +182,11 @@ enum abstract Ops(Int) {
 	var F32ReinterpretI32=0xbe;
 	var F64ReinterpretI64=0xbf;
 
+
+	// inline function new(i:Int) this = i;
+
 	@:to public inline function toInt():Int {
-		return switch this {
+		return switch cast this {
 			case I32Eqz: Op.init(0x45, "i32.eqz", [ValueTypeI32], ValueTypeI32);
 			case I32Eq: Op.init(0x46, "i32.eq", [ValueTypeI32, ValueTypeI32], ValueTypeI32);
 			case I32Ne: Op.init(0x47, "i32.ne", [ValueTypeI32, ValueTypeI32], ValueTypeI32);

@@ -127,7 +127,7 @@ class Disassembly {
 		for (instr in instrs) {
 			debug('stack top is ${stackDepths.top()}');
 			var opStr = instr.op;
-			var op:Int = opStr.code;
+			var op:Int = cast opStr.code;
 
 			if (op == End || op == Else) {
 				// There are two possible cases here:
@@ -162,7 +162,7 @@ class Disassembly {
 				checkMaxDepth(top);
 			}
 			
-			switch op {
+			switch cast op {
 				case Unreachable:
 					{
 						pushPolymorphicOp(blockPolymorphicOps, curIndex);
@@ -377,7 +377,7 @@ class Disassembly {
 					{
 						if (!instr.unreachable) {
 							var top = stackDepths.top();
-							switch op {
+							switch cast op {
 								case GetLocal | GetGlobal: {
 										top++;
 										stackDepths.setTop(top);
@@ -390,9 +390,11 @@ class Disassembly {
 								case TeeLocal: {
 										// stack remains unchanged for tee_local
 									}
+								case _:
 							}
 						}
 					}
+				case _:
 			}
 			if (op != Return) {
 				lastOpReturn = false;
@@ -422,6 +424,7 @@ class Disassembly {
 					op: opStr,
 					immediates: []
 				};
+				
 				switch op {
 					case Block | Loop | If:
 						{
@@ -520,7 +523,8 @@ class Disassembly {
 
 		for (ins in instr) {
 			body.writeByte(ins.op.code);
-			var op = ins.op.code;
+			var op:Ops = cast ins.op.code;
+
 			switch op {
 				case Block | Loop | If:
 					{
@@ -544,7 +548,7 @@ class Disassembly {
 				case Call | CallIndirect:
 					{
 						Leb128.writeUint32(body, ins.immediates[0]);
-						if (op == Ops.CallIndirect) {
+						if (op == CallIndirect) {
 							Leb128.writeUint32(body, ins.immediates[1]);
 						}
 					}
@@ -583,6 +587,7 @@ class Disassembly {
 					{
 						Leb128.writeUint32(body, ins.immediates[1]);
 					}
+				case _:
 			}
 		}
 

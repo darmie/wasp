@@ -69,8 +69,13 @@ class Global {
 				case f64Const:
 					{
 						// Todo: Make this accurate!
-						var v = Read.U64(r);
-						buf.writeDouble(cast v);
+						var v:U64 = Read.U64(r);
+						#if cs
+						var x = untyped __cs__('System.Convert.ToDouble({0})', v);
+						buf.writeDouble(x);
+						#else
+						buf.writeDouble(v);
+						#end
 						
 					}
 				case getGlobal:

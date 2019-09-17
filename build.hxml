@@ -4,10 +4,16 @@
 -cp binary128/numerix/src
 
 -lib hexlog
+-lib rxhaxe
 
 #-js bin/Wasp.js
 -D debug
 
+
+# --each 
+
 -java bin/wasp/java
 
-#-cs bin/wasp/bin/cs
+# --next
+
+# -cs bin/wasp/bin/cs
