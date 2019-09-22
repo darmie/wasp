@@ -7,12 +7,21 @@ haxe:
   - "3.4.7"
   - "development"
 
+git:
+  submodules: false
+
+before_install:
+  - git submodule update --init --remote --recursive
+  - haxelib git rxhaxe https://github.com/darmie/RxHaxe
+  - haxelib install hexlog
+  - haxelib install hxjava
+
 matrix:
   allow_failures:
     - haxe: development
 
-install:
-  - yes | haxelib install all
+# install:
+#   - yes | haxelib install all
 
 script:
   - haxe build.hxml
