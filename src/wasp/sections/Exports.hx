@@ -13,13 +13,17 @@ class Exports extends RawSection {
     public var entries:Map<String, ExportEntry>;
     public var names:Array<String> = [];
 
+    public function new(){
+        super();
+    }
+
     override function sectionID():SectionID {
         return SectionIDExport;
     }
 
     override function readPayload(r:BytesInput) {
         var count = Leb128.readUint32(r);
-        entries = [];
+        entries = new Map<String, ExportEntry>();
 
         for(i in 0...cast(count, Int)){
             var entry = new ExportEntry();

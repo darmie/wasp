@@ -16,6 +16,7 @@ import wasp.disasm.Disassembly;
 import haxe.io.BytesInput;
 import sys.FileSystem;
 import sys.io.File;
+import wasp.wast.Writer;
 
 /**
  * A simple Test class that dumps a disassembled wasm to text format.
@@ -37,71 +38,79 @@ class Test {
 
 				var m = Module.read(r, null);
 
-				var sbuf = new StringBuf();
+				var o = new StringBuf();
 
-				sbuf.add("\n");
+				// Wast output 
+				Writer.writeTo(o, m);
+				
+				// File.write("globals.wast");
+				File.saveContent("globals.wat", o.toString());
 
-				sbuf.add('###############################################\n');
-				sbuf.add('# Sample text representation of globals.wasm ##\n');
-				sbuf.add('###############################################\n');
+				// var sbuf = new StringBuf();
 
-				sbuf.add("\n");
+				// sbuf.add("\n");
 
-				// start module
-				sbuf.add("(module \n");
-				for (section in m.sections) {
-					switch section.sectionID() {
-						case SectionIDGlobal:
-							{
-								getGlobals(m.globalIndexSpace, sbuf);
-							}
-						case SectionIDExport:
-							{
-								for (export in m.export.entries) {
-									sbuf.add('  ');
-									var exp:Dynamic = null;
-									switch export.kind {
-										case ExternalFunction: {
-												var func = m.getFunction(export.index);
-												getFunctions(func, sbuf, true, export);
-											}
-										case ExternalGlobal: {
-												var globs = m.globalIndexSpace;
-												getGlobals(globs, sbuf, true, export);
-											}
-										case ExternalMemory: {
-												exp = 'memory';
-												for (mem in m.memory.entries) {}
-											}
-										case ExternalTable: exp = 'table';
-									}
+				// sbuf.add('###############################################\n');
+				// sbuf.add('# Sample text representation of globals.wasm ##\n');
+				// sbuf.add('###############################################\n');
 
-									sbuf.add('\n');
-								}
-								// sbuf.add('\n');
-							}
-						case SectionIDCode: {
-							for(body in m.code.bodies){
-								for (local in body.locals){
-									trace(local);
-								}
-							}
-						}
-						case SectionIDCustom:{
-							trace(m.customs[0].name);
-						}
-						case SectionIDFunction: {
-							// trace(m.function_.types);
-							// trace(m.function_.)
-						}
-						case SectionIDType: {
-							// trace(m.types.entries);
-						}
-						case _:
-					}
-				}
-				sbuf.add(")");
-				Sys.println(sbuf.toString());
+				// sbuf.add("\n");
+
+				// // start module
+				// sbuf.add("(module \n");
+				// for (section in m.sections) {
+				// 	switch section.sectionID() {
+				// 		case SectionIDGlobal:
+				// 			{
+				// 				getGlobals(m.globalIndexSpace, sbuf);
+				// 			}
+				// 		case SectionIDExport:
+				// 			{
+				// 				for (export in m.export.entries) {
+				// 					sbuf.add('  ');
+				// 					var exp:Dynamic = null;
+				// 					switch export.kind {
+				// 						case ExternalFunction: {
+				// 								var func = m.getFunction(export.index);
+				// 								getFunctions(func, sbuf, true, export);
+				// 							}
+				// 						case ExternalGlobal: {
+				// 								var globs = m.globalIndexSpace;
+				// 								getGlobals(globs, sbuf, true, export);
+				// 							}
+				// 						case ExternalMemory: {
+				// 								exp = 'memory';
+				// 								for (mem in m.memory.entries) {}
+				// 							}
+				// 						case ExternalTable: exp = 'table';
+				// 					}
+
+				// 					sbuf.add('\n');
+				// 				}
+				// 				// sbuf.add('\n');
+				// 			}
+				// 		case SectionIDCode: {
+				// 			for(body in m.code.bodies){
+				// 				for (local in body.locals){
+				// 					trace(local);
+				// 				}
+				// 			}
+				// 		}
+				// 		case SectionIDCustom:{
+				// 			trace(m.customs[0].name);
+				// 		}
+				// 		case SectionIDFunction: {
+				// 			// trace(m.function_.types);
+				// 			// trace(m.function_.)
+				// 		}
+				// 		case SectionIDType: {
+				// 			// trace(m.types.entries);
+				// 		}
+				// 		case _:
+				// 	}
+				// }
+				// sbuf.add(")");
+				// Sys.println(sbuf.toString());
 			}
 		} catch (e:Dynamic) {
 			throw e;
@@ -129,6 +138,10 @@ class Test {
 				sbuf.add('result ${returns}');
 				sbuf.add(")"); // close
 			}
+
+			/**
+			 * Disassemble a wasm function
+			 */
 			var d = new Disassembly(func, func.body.module);
 					
 			sbuf.add(' => ${[for(c in d.code) '(${c.op.name} ${c.immediates.join(" ")})'].join(" ")}');

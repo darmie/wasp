@@ -377,7 +377,7 @@ class Disassembly {
 					{
 						if (!instr.unreachable) {
 							var top = stackDepths.top();
-							switch op {
+							switch cast op {
 								case GetLocal | GetGlobal: {
 										top++;
 										stackDepths.setTop(top);
@@ -390,9 +390,11 @@ class Disassembly {
 								case TeeLocal: {
 										// stack remains unchanged for tee_local
 									}
+								case _:
 							}
 						}
 					}
+				case _:
 			}
 			if (op != Return) {
 				lastOpReturn = false;
@@ -414,7 +416,9 @@ class Disassembly {
 
 		while (true) {
 			try {
-				var op:Ops = cast reader.readByte();
+				var v = reader.readByte();
+				var op:Ops = cast v;
+
 
 				var opStr = Op.New(op);
 
@@ -422,7 +426,10 @@ class Disassembly {
 					op: opStr,
 					immediates: []
 				};
-				switch op {
+
+				var _op_:Int = op;
+				
+				switch _op_ {
 					case Block | Loop | If:
 						{
 							var sig:BlockType = Read.byte(reader);
@@ -521,6 +528,7 @@ class Disassembly {
 		for (ins in instr) {
 			body.writeByte(ins.op.code);
 			var op = ins.op.code;
+
 			switch op {
 				case Block | Loop | If:
 					{
@@ -544,7 +552,7 @@ class Disassembly {
 				case Call | CallIndirect:
 					{
 						Leb128.writeUint32(body, ins.immediates[0]);
-						if (op == Ops.CallIndirect) {
+						if (op == CallIndirect) {
 							Leb128.writeUint32(body, ins.immediates[1]);
 						}
 					}
@@ -583,6 +591,7 @@ class Disassembly {
 					{
 						Leb128.writeUint32(body, ins.immediates[1]);
 					}
+				case _:
 			}
 		}
 

@@ -3,7 +3,10 @@ package wasp.operators;
 import wasp.types.BlockType;
 import wasp.types.ValueType;
 
-enum abstract Ops(Int) {
+
+enum abstract Ops(Int){
+
+	// public inline function new(i:Int) this = i;
 
 	var I32Eqz = 0x45;
 	var I32Eq = 0x46;
@@ -178,6 +181,9 @@ enum abstract Ops(Int) {
 	var I64ReinterpretF64=0xbd;
 	var F32ReinterpretI32=0xbe;
 	var F64ReinterpretI64=0xbf;
+
+
+	// inline function new(i:Int) this = i;
 
 	@:to public inline function toInt():Int {
 		return switch this {
