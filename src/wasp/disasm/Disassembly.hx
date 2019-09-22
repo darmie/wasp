@@ -127,7 +127,7 @@ class Disassembly {
 		for (instr in instrs) {
 			debug('stack top is ${stackDepths.top()}');
 			var opStr = instr.op;
-			var op:Int = cast opStr.code;
+			var op:Int = opStr.code;
 
 			if (op == End || op == Else) {
 				// There are two possible cases here:
@@ -162,7 +162,7 @@ class Disassembly {
 				checkMaxDepth(top);
 			}
 			
-			switch cast op {
+			switch op {
 				case Unreachable:
 					{
 						pushPolymorphicOp(blockPolymorphicOps, curIndex);
@@ -416,7 +416,9 @@ class Disassembly {
 
 		while (true) {
 			try {
-				var op:Ops = cast reader.readByte();
+				var v = reader.readByte();
+				var op:Ops = cast v;
+
 
 				var opStr = Op.New(op);
 
@@ -424,8 +426,10 @@ class Disassembly {
 					op: opStr,
 					immediates: []
 				};
+
+				var _op_:Int = op;
 				
-				switch op {
+				switch _op_ {
 					case Block | Loop | If:
 						{
 							var sig:BlockType = Read.byte(reader);
@@ -523,7 +527,7 @@ class Disassembly {
 
 		for (ins in instr) {
 			body.writeByte(ins.op.code);
-			var op:Ops = cast ins.op.code;
+			var op = ins.op.code;
 
 			switch op {
 				case Block | Loop | If:

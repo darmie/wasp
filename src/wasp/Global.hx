@@ -50,8 +50,8 @@ class Global {
 		var buf = new BytesOutput();
 
 		while (true) {
-			var _b = r.readByte();
-			switch _b {
+			r.readFullBytes(b, 0, 1);
+			switch b.get(0) {
 				case i32Const:
 					{
 						buf.writeInt32(Leb128.readInt32(r));
@@ -65,14 +65,16 @@ class Global {
 					{	
 						var v = Read.U32(r);
 						buf.writeFloat(FPHelper.i32ToFloat(v));
+						// LittleEndian.PutUint32(buf, v);
 					}
 				case f64Const:
 					{
 						// Todo: Make this accurate!
 						var v:U64 = Read.U64(r);
+						// LittleEndian.PutUint64(buf, v);
 						#if cs
 						var x = untyped __cs__('System.Convert.ToDouble({0})', v);
-						buf.writeDouble(x);
+						buf.writeDouble(FPHelper.i64ToDouble(v.toInt64().low, v.toInt64().high));
 						#else
 						buf.writeDouble(v);
 						#end
@@ -88,7 +90,7 @@ class Global {
 					}
 				default:
 					{
-						throw new InvalidInitExprOpError(_b);
+						throw new InvalidInitExprOpError(b.get(0));
 					}
 			}
 		}
@@ -97,6 +99,10 @@ class Global {
 		}
 
 		return buf.getBytes();
+	}
+
+	static function floatToHex(f:Bytes){
+
 	}
 
 	/**

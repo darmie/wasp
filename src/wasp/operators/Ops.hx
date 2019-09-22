@@ -186,7 +186,7 @@ enum abstract Ops(Int){
 	// inline function new(i:Int) this = i;
 
 	@:to public inline function toInt():Int {
-		return switch cast this {
+		return switch this {
 			case I32Eqz: Op.init(0x45, "i32.eqz", [ValueTypeI32], ValueTypeI32);
 			case I32Eq: Op.init(0x46, "i32.eq", [ValueTypeI32, ValueTypeI32], ValueTypeI32);
 			case I32Ne: Op.init(0x47, "i32.ne", [ValueTypeI32, ValueTypeI32], ValueTypeI32);

@@ -3,6 +3,7 @@ package wasp.wast;
 import rx.Observer;
 import haxe.Int64;
 import haxe.io.*;
+import wasp.io.*;
 import wasp.*;
 import wasp.types.*;
 import wasp.Global.*;
@@ -63,8 +64,7 @@ class Writer {
 		this.writeElements();
 		this.writeData();
 
-		bw.add(")\n");
-		// bw.flush();
+		bw.add("\n)\n");
 	}
 
 	function writeString(s:String) {
@@ -244,7 +244,52 @@ class Writer {
 				writeString(')');
 			}
 			writeString(' (');
-			writeCode(e.init, true);
+			// writeCode(e.init, true);
+			// var instr = Disassembly.disassemble(e.init);
+			
+			// for(ins in instr){
+			// 	// trace('0x${StringTools.hex(ins.op.code)}');
+			// 	// // trace(ins.immediates.length);
+			// 	// if(ins.immediates.length > 0){
+					
+			// 	// }
+			// }
+
+			var buf = new BytesInput(e.init);
+			var type = e.type.type;
+			var value:Dynamic = null;
+			var xvalue:Dynamic = null;
+			switch type {
+				case ValueTypeI32:
+					value = buf.readInt32();
+					writeString('$type.const $value');
+				case ValueTypeI64:
+					value = buf.readInt32();
+					writeString('$type.const $value');
+				case ValueTypeF32:
+					var i:I32 = FPHelper.floatToI32(buf.readFloat());
+					var buf2 = new BytesOutput();
+					LittleEndian.PutUint32(buf2, cast i);
+					value = '0x'+buf2.getBytes().toHex();
+					xvalue = FPHelper.i32ToFloat(i);
+					writeString('$type.const $value (;=$xvalue;)');
+
+				case ValueTypeF64:
+					var i = buf.readDouble();
+					var v:I64 = i;
+					var buf2 = new BytesOutput();
+					buf2.writeDouble(i);
+					#if java
+					var S:String = untyped __java__('Long.toHexString({0})', v);
+					value = '0x${StringTools.replace(S, 'ffffffff', '')}00000000';
+					// var x = untyped __java__('new java.math.BigInteger({0}, 16)', S);
+					// trace(x);
+					#else
+					value = '0x'+buf2.getBytes().toHex();
+					#end
+					
+					writeString('$type.const $value');	
+			}
 			writeString('))');
 		}
 	}
@@ -358,7 +403,6 @@ class Writer {
 
 	function writeCode(code:Bytes, isInit:Bool) {
 		var instr = Disassembly.disassemble(code);
-       
 		var tabs = 2;
 		var block = 0;
 
@@ -368,11 +412,11 @@ class Writer {
 		var hadEnd = false;
 		for (i in 0...instr.length) {
 			var ins = instr[i];
-            trace(ins.op.name);
+            
 			if (!isInit) {
 				writeString("\n");
 			}
-            var op:Ops = cast ins.op.code;
+            var op = ins.op.code;
 
 			switch op {
 				case End | Else:
