@@ -4,8 +4,8 @@ dist: trusty
 language: haxe
 
 haxe:
-  - "3.4.7"
-  - "development"
+  # - "3.4.7"
+  # - "development"
   - "4.0.0-rc.3"
 
 git:
