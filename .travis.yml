@@ -7,6 +7,12 @@ haxe:
   - "3.4.7"
   - "development"
 
+git:
+  submodules: false
+
+before_install:
+  - git submodule update --init --remote --recursive
+
 matrix:
   allow_failures:
     - haxe: development
