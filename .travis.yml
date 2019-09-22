@@ -13,13 +13,14 @@ git:
 before_install:
   - git submodule update --init --remote --recursive
   - haxelib git rxhaxe https://github.com/longde123/RxHaxe
+  - haxelib install hexlog
 
 matrix:
   allow_failures:
     - haxe: development
 
-install:
-  - yes | haxelib install all
+# install:
+#   - yes | haxelib install all
 
 script:
   - haxe build.hxml
