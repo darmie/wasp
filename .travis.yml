@@ -12,6 +12,7 @@ git:
 
 before_install:
   - git submodule update --init --remote --recursive
+  - haxelib git rxhaxe https://github.com/longde123/RxHaxe
 
 matrix:
   allow_failures:
