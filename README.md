@@ -21,3 +21,6 @@ Run `haxelib install all` to install the dependencies.
 haxe build.hxml
 ```
 
+
+
+Wasp vector icon gotten freely from [Vecteezy](https://www.vecteezy.com/free-vector/wasp)
