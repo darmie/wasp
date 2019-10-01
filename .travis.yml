@@ -16,6 +16,7 @@ before_install:
   - haxelib git rxhaxe https://github.com/darmie/RxHaxe
   - haxelib install hexlog
   - haxelib install hxjava
+  - haxelib install hxcs
 
 matrix:
   allow_failures:

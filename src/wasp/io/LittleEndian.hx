@@ -1,5 +1,6 @@
 package wasp.io;
 
+import haxe.io.BytesBuffer;
 import haxe.io.BytesOutput;
 import haxe.io.BytesInput;
 import haxe.io.Bytes;
@@ -25,11 +26,12 @@ class LittleEndian {
 		b.writeByte(v);
 	}
 
-	public static function Uint64(b:Bytes):U64 {
-		return b.get(0) | b.get(1) << 8 | b.get(2) << 16 | b.get(3) << 24 | b.get(4) << 32 | b.get(5) << 40 | b.get(6) << 48 | b.get(7) << 56;
+	public static function Uint64(b:Bytes) {
+		var ret = b.get(0) | b.get(1) << 8 | b.get(2) << 16 | b.get(3) << 24 | b.get(4) << 32 | b.get(5) << 40 | b.get(6) << 48 | b.get(7) << 56;
+		return ret;	
 	}
 
-	public static function PutUint64(b:BytesOutput, v:U64) {
+	public static function PutUint64(b:BytesOutput, v) {
 		b.writeByte(cast v);
 		b.writeByte(cast(v >> 8));
 		b.writeByte(cast(v >> 16));

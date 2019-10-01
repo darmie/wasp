@@ -31,7 +31,7 @@ class Encode {
         LittleEndian.PutUint32(w, n);
     }
 
-    public static function writeU64(w:BytesOutput, n:U64) {
+    public static function writeU64(w:BytesOutput, n) {
         LittleEndian.PutUint64(w, n);
     }
 }

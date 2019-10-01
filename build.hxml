@@ -7,13 +7,13 @@
 -lib rxhaxe
 
 #-js bin/Wasp.js
--D debug
+#-D debug
 
 
-# --each 
+--each 
 
 -java bin/wasp/java
 
-# --next
+--next
 
-# -cs bin/wasp/bin/cs
+-cs bin/wasp/bin/cs

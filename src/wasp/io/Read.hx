@@ -54,6 +54,10 @@ class Read {
     public static function U64(r:BytesInput) {
         var buf = Bytes.alloc(8);
         r.readFullBytes(buf, 0, 8);
+        #if !cs
         return LittleEndian.Uint64(buf);
+        #else 
+        return untyped __cs__('System.BitConverter.ToUInt64({0}, 0)', buf.getData());
+        #end
     }
 }

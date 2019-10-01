@@ -1,5 +1,6 @@
 package wasp;
 
+import rx.observers.CheckedObserver.CheckState;
 import haxe.Int64;
 import haxe.ds.Vector;
 import haxe.io.*;
@@ -70,12 +71,13 @@ class Global {
 				case f64Const:
 					{
 						// Todo: Make this accurate!
-						var v:U64 = Read.U64(r);
-						// LittleEndian.PutUint64(buf, v);
 						#if cs
-						var x = untyped __cs__('System.Convert.ToDouble({0})', v);
-						buf.writeDouble(FPHelper.i64ToDouble(v.toInt64().low, v.toInt64().high));
+						var v:U64 = Read.U64(r);
+						var i:I64 = untyped __cs__('(long){0}', v);
+						var x:Float = untyped __cs__('System.BitConverter.Int64BitsToDouble({0})', i);
+						buf.writeDouble(x);
 						#else
+						var v = Read.U64(r);
 						buf.writeDouble(v);
 						#end
 						
@@ -128,25 +130,37 @@ class Global {
 				case i32Const:
 					{
 						var i = Leb128.readInt32(r);
+						#if !cs
 						stack.push(cast i);
+						#else 
+						stack.push(untyped __cs__('System.Convert.ToUInt64({0})', i));
+						#end
 						lastVal = ValueTypeI32;
 					}
 				case i64Const:
 					{
 						var i = Leb128.readInt64(r);
+						#if !cs
 						stack.push(cast i);
+						#else 
+						stack.push(untyped __cs__('System.Convert.ToUInt64({0})', i));
+						#end
 						lastVal = ValueTypeI64;
 					}
 				case f32Const:
 					{
 						var i = Read.U32(r);
+						#if !cs
 						stack.push(cast i);
+						#else 
+						stack.push(untyped __cs__('System.Convert.ToUInt64({0})', i));
+						#end
 						lastVal = ValueTypeF32;
 					}
 				case f64Const:
 					{
 						var i = Read.U64(r);
-						stack.push(cast i);
+						stack.push(i);
 						lastVal = ValueTypeF64;
 					}
 				case getGlobal:

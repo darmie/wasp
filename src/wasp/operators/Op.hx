@@ -96,7 +96,7 @@ class Op {
 			op.code = code;
 			op.name = name;
 
-			op.polymorphic = false;
+			op.polymorphic = true;
 
 			ops[code] = op;
 		}

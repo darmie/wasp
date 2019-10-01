@@ -4,8 +4,8 @@ import haxe.io.Eof;
 import haxe.io.BytesInput;
 import haxe.io.BytesOutput;
 import haxe.io.Bytes;
-import wasp.operators.Op;
 import wasp.operators.Ops;
+import wasp.operators.InstructionSet;
 import wasp.types.BlockType;
 import binary128.internal.Leb128;
 import wasp.Function;
@@ -52,8 +52,8 @@ typedef BlockInfo = {
  * Instr describes an instruction, consisting of an operator, with its
  * appropriate immediate value(s).
  */
-typedef Instr = {
-	?op:Op,
+typedef ISA = {
+	?op:InstructionSet,
 
 	/**
 	 * Immediates are arguments to an operator in the bytecode stream itself.
@@ -82,7 +82,7 @@ typedef Instr = {
  * Disassembly is the result of disassembling a WebAssembly function.
  */
 class Disassembly {
-	public var code:Array<Instr>;
+	public var code:Array<ISA>;
 
 	/**
 	 * The maximum stack depth that can be reached while executing this function
@@ -127,7 +127,7 @@ class Disassembly {
 		for (instr in instrs) {
 			debug('stack top is ${stackDepths.top()}');
 			var opStr = instr.op;
-			var op:Int = opStr.code;
+			var op:Ops = opStr;
 
 			if (op == End || op == Else) {
 				// There are two possible cases here:
@@ -145,16 +145,16 @@ class Disassembly {
 				instr.unreachable = !isInstrReachable(blockPolymorphicOps);
 			}
 
-			debug('op: ${opStr.name}, unreachable: ${instr.unreachable}');
-			if (!opStr.polymorphic && !instr.unreachable) {
+			debug('op: ${op}, unreachable: ${instr.unreachable}');
+			if (!op.isPolymorphic() && !instr.unreachable) {
 				var top = stackDepths.top();
-				top -= opStr.args.length;
+				top -= op.args().length;
 				
 				stackDepths.setTop(top);
 				if (top < -1) {
 					throw new ErrStackUnderflow();
 				}
-				if (opStr.returns != BlockTypeEmpty) {
+				if (op.returns() != BlockTypeEmpty) {
 					top++;
 					stackDepths.setTop(top);
 				}
@@ -235,7 +235,7 @@ class Disassembly {
 							instr.newStack = {};
 						}
 
-						debug('setting new stack for ${this.code[blockStartIndex].op.name} block (${blockStartIndex})');
+						debug('setting new stack for ${this.code[blockStartIndex].op} block (${blockStartIndex})');
 						this.code[blockStartIndex].newStack = instr.newStack;
 
 						if (!instr.unreachable) {
@@ -410,26 +410,22 @@ class Disassembly {
 		#end
 	}
 
-	public static function disassemble(code:Bytes):Array<Instr> {
+	public static function disassemble(code:Bytes):Array<ISA> {
 		var reader = new BytesInput(code);
-		var out:Array<Instr> = [];
+		var out:Array<ISA> = [];
 
 		while (true) {
 			try {
-				var v = reader.readByte();
-				var op:Ops = cast v;
-
-
-				var opStr = Op.New(op);
-
-				var instr:Instr = {
-					op: opStr,
+				var v:Ops = reader.readByte();
+				
+				var instr:ISA = {
+					op: v,
 					immediates: []
 				};
 
-				var _op_:Int = op;
 				
-				switch _op_ {
+				
+				switch v {
 					case Block | Loop | If:
 						{
 							var sig:BlockType = Read.byte(reader);
@@ -455,7 +451,7 @@ class Disassembly {
 						{
 							var index = Leb128.readUint32(reader);
 							instr.immediates.push(index);
-							if (op == CallIndirect) {
+							if (v == CallIndirect) {
 								var idx = Read.byte(reader);
 								if (idx != 0x00) {
 									error("table index in call_indirect must be 0");
@@ -522,12 +518,12 @@ class Disassembly {
 		return out;
 	}
 
-	public static function assemble(instr:Array<Instr>):Bytes {
+	public static function assemble(instr:Array<ISA>):Bytes {
 		var body = new BytesOutput();
 
 		for (ins in instr) {
-			body.writeByte(ins.op.code);
-			var op = ins.op.code;
+			body.writeByte(cast ins.op);
+			var op:Ops = ins.op;
 
 			switch op {
 				case Block | Loop | If:

@@ -89,6 +89,7 @@ class Writer {
 			}, (error) -> throw error, null);
 			this.writeFuncSignature(t).subscribe(subscriber).unsubscribe();
 		}
+		
 	}
 
 	function writeFuncSignature(t:FunctionSig) {
@@ -180,6 +181,7 @@ class Writer {
 			}
 			writeString(")");
 		}
+		
 	}
 
 	function writeFunctions() {
@@ -195,9 +197,16 @@ class Writer {
 			}
 			var ind = funcOff + i;
 			writeString('$tab(func ');
-			if (fnames.exists(cast ind)) {
+			// trace(fnames.exists(cast ind));
+			#if cs 
+			var nameIndex:U32 =  untyped __cs__('System.Convert.ToUInt32({0})', ind);
+			#else
+			var nameIndex:U32 =  cast ind;
+			#end
+			if (fnames.exists(nameIndex)) {
 				writeString("$");
-				writeString('${fnames.get(cast ind)}');
+				writeString('${fnames.get(nameIndex)}');
+				
 			} else {
 				writeString('(;$ind;)');
 			}
@@ -285,9 +294,9 @@ class Writer {
 					// var x = untyped __java__('new java.math.BigInteger({0}, 16)', S);
 					// trace(x);
 					#else
-					value = '0x'+buf2.getBytes().toHex();
+					var hex:String = untyped __cs__('System.BitConverter.DoubleToInt64Bits({0}).ToString("X");', i);
+					value = '0x${hex.toLowerCase()} (;=$i;)';
 					#end
-					
 					writeString('$type.const $value');	
 			}
 			writeString('))');
@@ -416,7 +425,7 @@ class Writer {
 			if (!isInit) {
 				writeString("\n");
 			}
-            var op = ins.op.code;
+            var op:Ops = ins.op;
 
 			switch op {
 				case End | Else:
@@ -441,7 +450,7 @@ class Writer {
 				}
 			}
            
-			writeString(ins.op.name);
+			writeString(op.toString());
 			switch op {
 				case Else:
 					{
@@ -525,7 +534,7 @@ class Writer {
 						var i1:U32 = ins.immediates[0];
 						var i2:U32 = ins.immediates[1];
 						var dst = 0;
-						switch cast ins.op.code {
+						switch op {
 							case I64Load | I64Store | F64Load | F64Store:
 								dst = 3;
 							case I32Load | I64Load32s | I64Load32u | I32Store | I64Store32 | F32Load | F32Store:

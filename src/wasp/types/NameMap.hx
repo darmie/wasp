@@ -9,7 +9,6 @@ import binary128.internal.Leb128;
  * maps an index of the entry to a name.
  */
 
-@:forward(exists)
 abstract NameMap(Map<U32, String>) to  Map<U32, String>{
     public inline function new(){
         this = new Map<U32, String>();
@@ -21,6 +20,10 @@ abstract NameMap(Map<U32, String>) to  Map<U32, String>{
 
     @:arrayAccess public inline function set(key:U32, value:String):Void {
         this.set(key, value);
+    }
+
+    public inline function exists(key:U32):Bool {
+        return this.exists(key);
     }
     public function toWasm(w:BytesOutput):Void {
         var keys = [];

@@ -1,5 +1,6 @@
 package;
 
+import wasp.operators.Ops;
 import wasp.sections.FunctionNames;
 import wasp.types.ExportEntry;
 import wasp.types.GlobalEntry;
@@ -17,6 +18,7 @@ import haxe.io.BytesInput;
 import sys.FileSystem;
 import sys.io.File;
 import wasp.wast.Writer;
+// import wasp.operators.Code;
 
 /**
  * A simple Test class that dumps a disassembled wasm to text format.
@@ -37,6 +39,8 @@ class Test {
 				var r = new BytesInput(raw);
 
 				var m = Module.read(r, null);
+
+				
 
 				var o = new StringBuf();
 
@@ -143,8 +147,8 @@ class Test {
 			 * Disassemble a wasm function
 			 */
 			var d = new Disassembly(func, func.body.module);
-					
-			sbuf.add(' => ${[for(c in d.code) '(${c.op.name} ${c.immediates.join(" ")})'].join(" ")}');
+			
+			sbuf.add(' => ${[for(c in d.code) '(${Ops.fromInstr(c.op).toString()} ${c.immediates.join(" ")})'].join(" ")}');
 			sbuf.add(")"); // close
 		}
 	}
