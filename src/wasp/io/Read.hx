@@ -33,10 +33,11 @@ class Read {
     public static function UTF8String(r:BytesInput, n) {
         var _bytes = bytes(r, n);
         if(_bytes == null) return "";
-        var s = _bytes.toString();
-        if(!haxe.Utf8.validate(s)){
+        
+        if(!UnicodeString.validate(_bytes, UTF8)){
             throw "wasm: invalid utf-8 string";
         }
+        var s = _bytes.toString();
         return s;
     }
 

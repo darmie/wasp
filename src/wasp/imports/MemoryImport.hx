@@ -1,18 +1,18 @@
 package wasp.imports;
 
-import binary128.internal.Leb128;
-import wasp.types.External;
-import wasp.types.ImportType;
+import wasp.types.*;
 import haxe.io.*;
 
-class FuncImport implements ImportType {
-    public var type:Int;
+
+class MemoryImport implements ImportType {
+
+    public var type:Memory;
 
     public function new() {
         
     }
     public function kind():External{
-        return ExternalFunction;
+        return ExternalMemory;
     }
     public function isImport():Void {}
 
@@ -21,7 +21,6 @@ class FuncImport implements ImportType {
     }
 
     public inline function toWasm(w:BytesOutput) {
-        Leb128.writeUint32(w, type);
+        type.toWasm(w);
     }
-
 }

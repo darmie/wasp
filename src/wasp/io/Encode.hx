@@ -27,6 +27,10 @@ class Encode {
         w.write(p);
     }
 
+    public static function writeStringUint(w:BytesOutput, s:String) {
+        writeBytesUint(w, Bytes.ofString(s));
+    }
+
     public static function writeU32(w:BytesOutput, n:U32) {
         LittleEndian.PutUint32(w, n);
     }

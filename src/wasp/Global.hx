@@ -76,6 +76,11 @@ class Global {
 						var i:I64 = untyped __cs__('(long){0}', v);
 						var x:Float = untyped __cs__('System.BitConverter.Int64BitsToDouble({0})', i);
 						buf.writeDouble(x);
+						#elseif cpp 
+						var v:U64 = Read.U64(r);
+						untyped __cpp__('int64_t vv = ({0} >> 11) | (0x3FFL << 53)', v);
+						var x:Float = untyped __cpp__('*(double*)&vv');
+						buf.writeDouble(x);
 						#else
 						var v = Read.U64(r);
 						buf.writeDouble(v);

@@ -1,11 +1,16 @@
 package wasp.imports;
 
 import wasp.types.*;
-
+import haxe.io.*;
 
 
 class TableImport implements ImportType {
     public var type:Table;
+
+    public function new() {
+        
+    }
+
     public function kind():External{
         return ExternalTable;
     }

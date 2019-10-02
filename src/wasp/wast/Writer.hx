@@ -15,6 +15,21 @@ import wasp.operators.Ops;
 /**
  * Generates WAST output from a wasm stream;
  */
+// #if cpp 
+// @:include('<string>')
+// @:include('<iostream>')
+// @:include('<sstream>')
+// @:headerClassCode("
+// static std::string int64_to_hex( int64_t i )
+// {
+//   std::stringstream stream;
+//   stream << '0x'
+//          << std::setfill ('0') << std::setw(sizeof(int64_t)*2) 
+//          << std::hex << i;
+//   return stream.str();
+// }
+// ")
+// #end
 class Writer {
 	var buf:StringBuf;
 	var m:Module;
@@ -89,7 +104,6 @@ class Writer {
 			}, (error) -> throw error, null);
 			this.writeFuncSignature(t).subscribe(subscriber).unsubscribe();
 		}
-		
 	}
 
 	function writeFuncSignature(t:FunctionSig) {
@@ -285,7 +299,9 @@ class Writer {
 
 				case ValueTypeF64:
 					var i = buf.readDouble();
+					#if !cpp
 					var v:I64 = i;
+					#end
 					var buf2 = new BytesOutput();
 					buf2.writeDouble(i);
 					#if java
@@ -293,9 +309,11 @@ class Writer {
 					value = '0x${StringTools.replace(S, 'ffffffff', '')}00000000';
 					// var x = untyped __java__('new java.math.BigInteger({0}, 16)', S);
 					// trace(x);
-					#else
+					#elseif cs
 					var hex:String = untyped __cs__('System.BitConverter.DoubleToInt64Bits({0}).ToString("X");', i);
 					value = '0x${hex.toLowerCase()} (;=$i;)';
+					#else 
+					value = '0x${buf2.getBytes().toHex()}';
 					#end
 					writeString('$type.const $value');	
 			}

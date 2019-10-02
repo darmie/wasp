@@ -31,7 +31,8 @@ class LittleEndian {
 		return ret;	
 	}
 
-	public static function PutUint64(b:BytesOutput, v) {
+	public static function PutUint64(b:BytesOutput, v:U64) {
+		#if !cpp
 		b.writeByte(cast v);
 		b.writeByte(cast(v >> 8));
 		b.writeByte(cast(v >> 16));
@@ -40,5 +41,15 @@ class LittleEndian {
 		b.writeByte(cast(v >> 40));
 		b.writeByte(cast(v >> 48));
 		b.writeByte(cast(v >> 56));
+		#else 
+		b.writeByte(v);
+		b.writeByte(v >> 8);
+		b.writeByte(v >> 16);
+		b.writeByte(v >> 24);
+		b.writeByte(v >> 32);
+		b.writeByte(v >> 40);
+		b.writeByte(v >> 48);
+		b.writeByte(v >> 56);
+		#end
 	}
 }
