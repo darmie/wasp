@@ -1,14 +1,14 @@
 {
   "name": "Wasp",
-  "url" : "https://github.com/YOUR_NAME/Wasp/",
+  "url" : "https://github.com/darmie/Wasp/",
   "license": "MIT",
   "tags": ["haxe","js"],
-  "description": "description of Wasp",
+  "description": "A WebAssembly Utility for Haxe",
   "classPath": "src",
   "version": "0.0.1",
   "releasenote": "Initial release",
-  "contributors": ["YOUR_NAME"],
+  "contributors": ["Damilare Akinlaja"],
   "dependencies": {
-
+    
   }
 }

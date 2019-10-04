@@ -1,8 +1,8 @@
 -main Test
 -cp src/
--cp binary128/src/
--cp binary128/numerix/src
 
+-lib Binary128 
+-lib Numerix
 -lib hexlog
 -lib rxhaxe
 

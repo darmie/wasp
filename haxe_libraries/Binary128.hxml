@@ -1,0 +1,3 @@
+-D Binary128=0.0.1
+# @install: lix --silent download "gh://github.com/darmie/binary128#917b43e6450ccae5b73bdfd5313c6253dbf5b5ed" into Binary128/0.0.1/github/917b43e6450ccae5b73bdfd5313c6253dbf5b5ed
+-cp ${HAXE_LIBCACHE}/Binary128/0.0.1/github/917b43e6450ccae5b73bdfd5313c6253dbf5b5ed/src

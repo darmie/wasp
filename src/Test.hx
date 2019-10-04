@@ -40,15 +40,15 @@ class Test {
 
 				var m = Module.read(r, null);
 
-				trace(m);
+				// trace(m);
 
-				// var o = new StringBuf();
+				var o = new StringBuf();
 
-				// // Wast output 
-				// Writer.writeTo(o, m);
+				// Wast output 
+				Writer.writeTo(o, m);
 				
-				// // File.write("globals.wast");
-				// File.saveContent("globals.wat", o.toString());
+				// File.write("globals.wast");
+				File.saveContent("globals.wat", o.toString());
 
 				// var sbuf = new StringBuf();
 

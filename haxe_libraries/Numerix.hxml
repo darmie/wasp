@@ -1,0 +1,3 @@
+-D Numerix=0.0.1
+# @install: lix --silent download "gh://github.com/darmie/numerix#3bb196f5511c38f087c1bd6750253fa37ecac91a" into Numerix/0.0.1/github/3bb196f5511c38f087c1bd6750253fa37ecac91a
+-cp ${HAXE_LIBCACHE}/Numerix/0.0.1/github/3bb196f5511c38f087c1bd6750253fa37ecac91a/src
