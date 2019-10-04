@@ -2,12 +2,12 @@
   "name": "Wasp",
   "url" : "https://github.com/darmie/Wasp/",
   "license": "MIT",
-  "tags": ["haxe","js"],
+  "tags": ["haxe","js", "cpp", "java", "hl", "neko"],
   "description": "A WebAssembly Utility for Haxe",
   "classPath": "src",
   "version": "0.0.1",
   "releasenote": "Initial release",
-  "contributors": ["Damilare Akinlaja"],
+  "contributors": ["darmie"],
   "dependencies": {
     
   }
