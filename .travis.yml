@@ -14,6 +14,8 @@ git:
 before_install:
   - git submodule update --init --remote --recursive
   - haxelib git rxhaxe https://github.com/darmie/RxHaxe
+  - haxelib git Binary128 https://github.com/darmie/Binary128
+  - haxelib git Numerix https://github.com/darmie/Numerix
   - haxelib install hexlog
   - haxelib install hxjava
   # - haxelib install hxcs
