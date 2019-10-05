@@ -61,7 +61,7 @@ try {
 }
 ```
 
-## Instruction Set Architecture
+## Instruction Set 
 WASP provides an ISA that can be useful in an interpreter or virtual machine. 
 The ISA is defined as such:
 
