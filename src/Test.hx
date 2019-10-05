@@ -18,11 +18,12 @@ import haxe.io.BytesInput;
 import sys.FileSystem;
 import sys.io.File;
 import wasp.wast.Writer;
+
 // import wasp.operators.Code;
 
 /**
  * A simple Test class that dumps a disassembled wasm to text format.
- * 
+ *
  * PS: The text format is not the standard wat or wast format
  */
 class Test {
@@ -40,14 +41,14 @@ class Test {
 
 				var m = Module.read(r, null);
 
-				// trace(m);
-
 				var o = new StringBuf();
 
-				// Wast output 
+				// trace(m);
+
+				// // Wast output
 				Writer.writeTo(o, m);
-				
-				// File.write("globals.wast");
+
+				// // File.write("globals.wast");
 				File.saveContent("globals.wat", o.toString());
 
 				// var sbuf = new StringBuf();
@@ -124,33 +125,33 @@ class Test {
 	static function getFunctions(func:wasp.Function, sbuf:StringBuf, isExport:Bool = false, export:ExportEntry = null) {
 		var hasParams = func.sig.paramTypes.length != 0;
 		var hasReturn = func.sig.returnTypes.length != 0;
+		sbuf.add("("); // open
+		sbuf.add("func ");
 		if (isExport) {
-			sbuf.add("("); // open
-			sbuf.add("func ");
 			sbuf.add("("); // open
 			sbuf.add('export "${export.fieldStr}"');
 			sbuf.add(") "); // close
-			if (hasParams) {
-				var params = [for (_p in func.sig.paramTypes) _p.toString()].join(" ");
-				sbuf.add("("); // open
-				sbuf.add('param ${params}');
-				sbuf.add(")"); // close
-			}
-			if (hasReturn) {
-				var returns = [for (_r in func.sig.returnTypes) _r.toString()].join(" ");
-				sbuf.add("("); // open
-				sbuf.add('result ${returns}');
-				sbuf.add(")"); // close
-			}
-
-			/**
-			 * Disassemble a wasm function
-			 */
-			var d = new Disassembly(func, func.body.module);
-			
-			sbuf.add(' => ${[for(c in d.code) '(${Ops.fromInstr(c.op).toString()} ${c.immediates.join(" ")})'].join(" ")}');
+		}
+		if (hasParams) {
+			var params = [for (_p in func.sig.paramTypes) _p.toString()].join(" ");
+			sbuf.add("("); // open
+			sbuf.add('param ${params}');
 			sbuf.add(")"); // close
 		}
+		if (hasReturn) {
+			var returns = [for (_r in func.sig.returnTypes) _r.toString()].join(" ");
+			sbuf.add("("); // open
+			sbuf.add('result ${returns}');
+			sbuf.add(")"); // close
+		}
+
+		/**
+		 * Disassemble a wasm function
+		 */
+		var d = new Disassembly(func, func.body.module);
+
+		sbuf.add(' => ${[for(c in d.code) '(${Ops.fromInstr(c.op).toString()} ${c.immediates.join(" ")})'].join(" ")}');
+		sbuf.add(")"); // close
 	}
 
 	static function getGlobals(indexSpace:Array<GlobalEntry>, sbuf:StringBuf, isExport:Bool = false, export:ExportEntry = null) {
