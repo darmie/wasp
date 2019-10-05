@@ -8,3 +8,5 @@ DS_Store
 *.orig
 .idea
 ide.hxml
+
+*.wat
