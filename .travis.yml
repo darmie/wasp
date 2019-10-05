@@ -33,7 +33,7 @@ script:
 
 deploy:
   - provider: script
-    haxe: 3.4.7
+    haxe: 4.0.0-rc.3
     script: bash ./release_haxelib.sh $HAXELIB_PWD
     on:
       tags: true
