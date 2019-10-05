@@ -156,7 +156,7 @@ for(func in module.functionIndexSpace){
     }
 
     
-    var fbody:String = '${[for(c in d.code) '(${Ops.fromInstr(c.op)} ${c.immediates.join(" ")})'].join("\n\t")}';
+    var fbody:String = '${[for(c in code) '(${Ops.fromInstr(c.op)} ${c.immediates.join(" ")})'].join("\n\t")}';
     
     o.add(' => \n\t ${fbody}');
 
