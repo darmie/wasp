@@ -1,4 +1,4 @@
-![wasp logo](wasp.png)  ![](https://travis-ci.org/darmie/wasp.svg?branch=master)
+![wasp logo](wasp.png)  [![Build Status](https://travis-ci.org/darmie/wasp.svg?branch=master)](https://travis-ci.org/darmie/wasp)
 
 WebAssembly Utility for Haxe
 
