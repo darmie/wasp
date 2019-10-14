@@ -14,12 +14,12 @@ class ResizableLimits implements Marshaller {
     /**
      * initial length (in units of table elements or wasm pages)
      */
-    public var initial:Int;
+    public var initial:U32;
 
     /**
      * If flags is 1, it describes the maximum size of the table or memory
      */
-    public var maximum:Int;
+    public var maximum:U32;
 
     public function new(initial:Int) {
         

@@ -17,7 +17,7 @@ class FunctionNames implements NameSubSection {
     }
 
     public function fromWasm(r:BytesInput):Void {
-         names = new NameMap();
+        names = new NameMap();
         names.fromWasm(r);
     }
 }
