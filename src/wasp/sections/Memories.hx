@@ -8,6 +8,11 @@ import wasp.types.Memory;
 class Memories extends RawSection {
     public var entries:Array<Memory>;
 
+    public function new() {
+        super();
+        entries = [];
+    }
+
     override function sectionID():SectionID {
         return SectionIDMemory;
     }

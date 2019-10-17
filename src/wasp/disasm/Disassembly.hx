@@ -125,6 +125,7 @@ class Disassembly {
 		var lastOpReturn = false;
 
 		for (instr in instrs) {
+			
 			debug('stack top is ${stackDepths.top()}');
 			var opStr = instr.op;
 			var op:Ops = opStr;
@@ -144,11 +145,12 @@ class Disassembly {
 			} else {
 				instr.unreachable = !isInstrReachable(blockPolymorphicOps);
 			}
-
 			debug('op: ${op}, unreachable: ${instr.unreachable}');
+			
 			if (!op.isPolymorphic() && !instr.unreachable) {
 				var top = stackDepths.top();
-				top -= op.args().length;
+				
+				top -= op.args() != null ? op.args().length : 0;
 				
 				stackDepths.setTop(top);
 				if (top < -1) {
@@ -161,6 +163,8 @@ class Disassembly {
 
 				checkMaxDepth(top);
 			}
+
+			
 			
 			switch op {
 				case Unreachable:
@@ -396,16 +400,17 @@ class Disassembly {
 					}
 				case _:
 			}
+			
 			if (op != Return) {
 				lastOpReturn = false;
 			}
 			this.code.push(instr);
 			curIndex++;
 		}
-
+		
 		#if debug
 		for (instr in this.code) {
-			debug('${instr.op.name} ${instr.newStack}');
+			debug('${instr.op} ${instr.newStack}');
 		}
 		#end
 	}

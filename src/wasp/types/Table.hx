@@ -12,7 +12,8 @@ class Table implements Marshaller {
     public var limits:ResizableLimits;
 
     public function new() {
-        
+        elementType = ElemTypeAnyFunc;
+        limits = new ResizableLimits(0);
     }
 
     public function toWasm(w:BytesOutput) {

@@ -11,7 +11,7 @@ class LittleEndian {
 		return b.get(0) | b.get(1) << 8;
 	}
 
-	public static function PutUint16(b:Bytes, v:Int) {
+	public static function PutUint16(b:Bytes, v:UInt) {
 		b.set(0, v);
 		b.set(1, v >> 8);
 	}

@@ -12,10 +12,10 @@
 
 # --each 
 
--java bin/wasp/java
+# -java bin/wasp/java
 
 # --next
 
-# -cs bin/wasp/bin/cs
+-cs bin/wasp/bin/cs
 
 # -cpp bin/wasp/cpp

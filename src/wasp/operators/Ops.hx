@@ -215,7 +215,7 @@ enum abstract Ops(Int) from Int to Int {
 		}
 	}
 
-	public inline function args():Array<ValueType>{
+	public function args():Array<ValueType>{
 		var isa:InstructionSet = toIntr();
 		return  switch (isa){
 			case Op(_, _, args, _): args;
