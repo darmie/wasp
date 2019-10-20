@@ -27,7 +27,7 @@ class ResizableLimits implements Marshaller {
 
     public function toWasm(w:BytesOutput) {
         var f = flags;
-        if(f != 0 && f != -1){
+        if(f != 0 && f != 1){
             throw "wasm: invalid limit flag";
         }
 
@@ -41,7 +41,7 @@ class ResizableLimits implements Marshaller {
 
     public function fromWasm(r:BytesInput) {
         var f = r.readByte();
-        if(f != 0 && f != -1){
+        if(f != 0 && f != 1){
             throw "wasm: invalid limit flag";
         }
 

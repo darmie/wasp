@@ -49,7 +49,7 @@ class SectionsReader {
 		
 			s.start = r.position;
 			var sectionBytes = Bytes.alloc(payloadDataLen);
-			r.readFullBytes(sectionBytes, 0, payloadDataLen);
+			r.readBytes(sectionBytes, 0, payloadDataLen);
 			var sectionReader = new BytesInput(sectionBytes); //new LimitReader(new TeeReader(r, sectionBytes), payloadDataLen);
 		
 

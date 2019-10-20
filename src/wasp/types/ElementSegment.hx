@@ -28,6 +28,7 @@ class ElementSegment implements Marshaller {
 		offset = readInitExpr(r);
 
 		var numElems = Leb128.readUint32(r);
+		elems = [];
         
 		for(i in 0...cast(numElems, Int)){
 			var e = Leb128.readUint32(r);

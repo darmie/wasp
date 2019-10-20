@@ -104,6 +104,7 @@ class Module {
 		m.linearMemoryIndexSpace = [];
 		if (m.table != null) {
 			m.tableIndexSpace = new Array<Array<U32>>();
+			for(e in m.table.entries) m.tableIndexSpace.push([]);
 		}
 		if (m.import_ != null) {
 			if (m.code == null) {
@@ -111,9 +112,11 @@ class Module {
 			}
 			m.resolveImports(resolvePath);
 		}
+		var count = 0;
 		for (fn in [m.populateGlobals, m.populateFunctions, m.populateTables, m.populateLinearMemory]) {
 			try {
 				fn();
+				count++;
 			} catch (e:Dynamic) {
 				throw e;
 			}
@@ -250,7 +253,7 @@ class Module {
 			var nSec:NameSection = new NameSection();
 			var bi = new BytesInput(s.data);
 			nSec.fromWasm(bi);
-
+			
 			if (nSec.types[NameFunction].length > 0) {
 				var sub = nSec.decode(NameFunction);
 				var funcs:FunctionNames = cast sub;
@@ -306,14 +309,13 @@ class Module {
 		if (table == null || table.entries.length == 0 || elements == null || elements.entries.length == 0) {
 			return;
 		}
-
+		
 		for (elem in elements.entries) {
 			// the MVP dictates that index should always be zero, we should probably check this
 			if (cast(elem.index, Int) >= tableIndexSpace.length) {
 				var err:InvalidTableIndexError = cast elem.index;
 				throw err;
 			}
-
 			var val = execInitExpr(this, elem.offset);
 			var off:Int32 = 0;
 			var offset = 0;
@@ -346,7 +348,6 @@ class Module {
 				}
 			}
 		}
-
 		hex.log.HexLog.info('There are ${tableIndexSpace.length} entries in the table index space.');
 	}
 

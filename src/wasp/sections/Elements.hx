@@ -18,6 +18,7 @@ class Elements extends RawSection {
 
     override function readPayload(r:BytesInput) {
         var count = Leb128.readUint32(r);
+        entries = [];
         for(i in 0...cast(count, Int)){
             var segment = new ElementSegment();
             segment.fromWasm(r);

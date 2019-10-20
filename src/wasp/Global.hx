@@ -39,7 +39,6 @@ class Global {
 	public static inline var getGlobal = 0x23;
 	public static inline var end = 0x0b;
 
-
 	// public static function __init__() {
 	// 	for(op in ops){
 	// 		op = new Op();
@@ -51,32 +50,43 @@ class Global {
 		var buf = new BytesOutput();
 
 		while (true) {
-			r.readFullBytes(b, 0, 1);
-			switch b.get(0) {
+			// r.readBytes(b, 0, 1);
+			var op = r.readByte();
+			switch op {
 				case i32Const:
 					{
-						buf.writeInt32(Leb128.readInt32(r));
+						var v = Leb128.readInt32(r);
+						buf.writeByte(op);
+						if(v > 0){
+							buf.writeInt32(v);
+						} else {
+							buf.writeByte(v);
+						}
+						
 					}
 				case i64Const:
 					{
 						var v = Leb128.readInt64(r);
+						buf.writeByte(op);
 						buf.writeDouble(FPHelper.i64ToDouble(v.low, v.high));
 					}
 				case f32Const:
-					{	
+					{
 						var v = Read.U32(r);
+						buf.writeByte(op);
 						buf.writeFloat(FPHelper.i32ToFloat(v));
 						// LittleEndian.PutUint32(buf, v);
 					}
 				case f64Const:
 					{
+						buf.writeByte(op);
 						// Todo: Make this accurate!
 						#if cs
 						var v:U64 = Read.U64(r);
 						var i:I64 = untyped __cs__('(long){0}', v);
 						var x:Float = untyped __cs__('System.BitConverter.Int64BitsToDouble({0})', i);
 						buf.writeDouble(x);
-						#elseif cpp 
+						#elseif cpp
 						var v:U64 = Read.U64(r);
 						untyped __cpp__('int64_t vv = ({0} >> 11) | (0x3FFL << 53)', v);
 						var x:Float = untyped __cpp__('*(double*)&vv');
@@ -85,14 +95,15 @@ class Global {
 						var v = Read.U64(r);
 						buf.writeDouble(v);
 						#end
-						
 					}
 				case getGlobal:
 					{
+						buf.writeByte(op);
 						LittleEndian.PutUint32(buf, Leb128.readUint32(r));
 					}
 				case end:
 					{
+						buf.writeByte(op);
 						break;
 					}
 				default:
@@ -104,13 +115,11 @@ class Global {
 		if (buf.length == 0) {
 			throw new ErrorEmptyInitExpr();
 		}
-
-		return buf.getBytes();
+		var ret = buf.getBytes();
+		return ret;
 	}
 
-	static function floatToHex(f:Bytes){
-
-	}
+	static function floatToHex(f:Bytes) {}
 
 	/**
 	 * executes an initializer expression and returns a value
@@ -129,66 +138,74 @@ class Global {
 			throw new ErrorEmptyInitExpr();
 		}
 		while (true) {
-			var b = r.readByte();
-			var _break = false;
-			switch b {
-				case i32Const:
-					{
-						var i = Leb128.readInt32(r);
-						#if !cs
-						stack.push(cast i);
-						#else 
-						stack.push(untyped __cs__('System.Convert.ToUInt64({0})', i));
-						#end
-						lastVal = ValueTypeI32;
-					}
-				case i64Const:
-					{
-						var i = Leb128.readInt64(r);
-						#if !cs
-						stack.push(cast i);
-						#else 
-						stack.push(untyped __cs__('System.Convert.ToUInt64({0})', i));
-						#end
-						lastVal = ValueTypeI64;
-					}
-				case f32Const:
-					{
-						var i = Read.U32(r);
-						#if !cs
-						stack.push(cast i);
-						#else 
-						stack.push(untyped __cs__('System.Convert.ToUInt64({0})', i));
-						#end
-						lastVal = ValueTypeF32;
-					}
-				case f64Const:
-					{
-						var i = Read.U64(r);
-						stack.push(i);
-						lastVal = ValueTypeF64;
-					}
-				case getGlobal:
-					{
-						var i = Leb128.readInt32(r);
-						var globalVar = module.getGlobal(cast i);
-						if (globalVar == null) {
-							throw new InvalidGlobalIndexError(cast i);
+			try {
+				var b = r.readByte();
+				var _break = false;
+				switch b {
+					case i32Const:
+						{
+							var i = Leb128.readInt32(r);
+							#if !cs
+							stack.push(cast i);
+							#else
+							stack.push(untyped __cs__('System.Convert.ToUInt64({0})', i));
+							#end
+							lastVal = ValueTypeI32;
 						}
-						lastVal = globalVar.type.type;
-					}
-				case end:
-					{
-						_break = true;
-						break;
-					}
-				default:
-					{
-						throw new InvalidInitExprOpError(b);
-					}
-			}
-			if (_break) {
-				break;
+					case i64Const:
+						{
+							var i = Leb128.readInt64(r);
+							#if !cs
+							stack.push(cast i);
+							#else
+							stack.push(untyped __cs__('System.Convert.ToUInt64({0})', i));
+							#end
+							lastVal = ValueTypeI64;
+						}
+					case f32Const:
+						{
+							var i = Read.U32(r);
+							#if !cs
+							stack.push(cast i);
+							#else
+							stack.push(untyped __cs__('System.Convert.ToUInt64({0})', i));
+							#end
+							lastVal = ValueTypeF32;
+						}
+					case f64Const:
+						{
+							var i = Read.U64(r);
+							stack.push(i);
+							lastVal = ValueTypeF64;
+						}
+					case getGlobal:
+						{
+							var i = Leb128.readInt32(r);
+							var globalVar = module.getGlobal(cast i);
+							if (globalVar == null) {
+								throw new InvalidGlobalIndexError(cast i);
+							}
+							lastVal = globalVar.type.type;
+						}
+					case end:
+						{
+							_break = true;
+							break;
+						}
+					default:
+						{
+							throw new InvalidInitExprOpError(b);
+						}
+				}
+				if (_break) {
+					break;
+				}
+			} catch (e:Dynamic) {
+				if(Std.is(e, Eof)){
+					break;
+				}else {
+					throw e;
+				}
 			}
 		}
 		if (stack.length == 0) {
