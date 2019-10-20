@@ -20,10 +20,10 @@ class LittleEndian {
 	}
 
 	public static function PutUint32(b:BytesOutput, v:U32) {
-		b.writeByte(v >> 24);
-		b.writeByte(v >> 16);
-		b.writeByte(v >> 8);
 		b.writeByte(v);
+		b.writeByte(v >> 8);
+		b.writeByte(v >> 16);
+		b.writeByte(v >> 24);
 	}
 
 	public static function Uint64(b:Bytes) {
