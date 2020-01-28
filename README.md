@@ -294,7 +294,7 @@ A `globals.wat` file will be generated from the `globals.wasm` binary
 
 ### Project Status
 C# and Java targets are already looking good.
-_Notice: Please note that WASP has an issue with reading accurate unsigned integers in C# and Java targets from Bytes, especially during conversion to other integer types_
+_Notice: Please note that WASP has an issue with reading accurate unsigned integer casts of float values in C# and Java targets from Bytes, especially during conversion to other integer types_
 
 C++ target is still very much WIP, some issues related to `invalid cast` is being fixed.
 
