@@ -1,5 +1,6 @@
 package wasp.io;
 
+import haxe.io.BytesData;
 import haxe.io.BytesBuffer;
 import haxe.io.BytesOutput;
 import haxe.io.BytesInput;

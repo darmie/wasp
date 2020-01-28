@@ -52,7 +52,6 @@ class Writer {
 		this.m = m;
 		this.buf = w;
 		this.fnames = new NameMap();
-
 		var s = m.custom(CustomSectionName);
 		if (s != null) {
 			var names:NameSection = new NameSection();
@@ -162,16 +161,15 @@ class Writer {
 
 	function writeImports() {
 		funcOff = 0;
-
 		if (m.import_ == null)
 			return;
-
 		writeString("\n");
 		for (i in 0...m.import_.entries.length) {
 			var e = m.import_.entries[i];
 			if (i != 0) {
 				writeString("\n");
 			}
+		
 			writeString('$tab(import ');
 			writeString('"${e.moduleName}" "${e.fieldName}"');
 
@@ -195,8 +193,8 @@ class Writer {
 			}
 			writeString(")");
 		}
-		
-	}
+
+	}	
 
 	function writeFunctions() {
 		if (m.function_ == null)
@@ -277,20 +275,22 @@ class Writer {
 					
 			// 	// }
 			// }
-
-			var buf = new BytesInput(e.init);
+		
+			var buf = e.init;
 			var type = e.type.type;
 			var value:Dynamic = null;
 			var xvalue:Dynamic = null;
 			switch type {
 				case ValueTypeI32:
-					value = buf.readInt32();
-					writeString('$type.const $value');
+					var v:I32 = buf.getInt32(1);
+					writeString('$type.const $v');
 				case ValueTypeI64:
-					value = buf.readInt32();
-					writeString('$type.const $value');
+					value = buf.getDouble(1);
+					var v = FPHelper.doubleToI64(value);
+					writeString('$type.const $v');
 				case ValueTypeF32:
-					var i:I32 = FPHelper.floatToI32(buf.readFloat());
+					var x = buf.getFloat(0);
+					var i:I32 = FPHelper.floatToI32(x);
 					var buf2 = new BytesOutput();
 					LittleEndian.PutUint32(buf2, cast i);
 					value = '0x'+buf2.getBytes().toHex();
@@ -298,7 +298,7 @@ class Writer {
 					writeString('$type.const $value (;=$xvalue;)');
 
 				case ValueTypeF64:
-					var i = buf.readDouble();
+					var i =  buf.getDouble(0);
 					#if !cpp
 					var v:I64 = i;
 					#end

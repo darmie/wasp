@@ -5,8 +5,8 @@
   "tags": ["haxe","js", "cpp", "java", "hl", "neko"],
   "description": "A WebAssembly Utility for Haxe",
   "classPath": "src",
-  "version": "0.0.5",
-  "releasenote": "fix bit order in LE PutUint32 implementation",
+  "version": "0.0.7",
+  "releasenote": "fix issues related with NameSection, execInitExpr, readInitExpr, Tables, Elements, ElementSegments and CallIndirect",
   "contributors": ["darmie"],
   "dependencies": {
     

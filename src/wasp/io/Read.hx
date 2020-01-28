@@ -49,7 +49,11 @@ class Read {
     public static function U32(r:BytesInput) {
         var buf = Bytes.alloc(4);
         r.readFullBytes(buf, 0, 4);
+        #if cs
+        return untyped __cs__('System.BitConverter.ToUInt32({0}, 0)', buf.getData());
+        #else
         return LittleEndian.Uint32(buf);
+        #end
     }
 
     public static function U64(r:BytesInput) {

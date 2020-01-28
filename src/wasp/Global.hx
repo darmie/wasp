@@ -1,6 +1,6 @@
 package wasp;
 
-import rx.observers.CheckedObserver.CheckState;
+
 import haxe.Int64;
 import haxe.ds.Vector;
 import haxe.io.*;
@@ -48,21 +48,16 @@ class Global {
 	public static function readInitExpr(r:BytesInput):Bytes {
 		var b = Bytes.alloc(1);
 		var buf = new BytesOutput();
-
+		
 		while (true) {
 			// r.readBytes(b, 0, 1);
 			var op = r.readByte();
 			switch op {
 				case i32Const:
 					{
-						var v = Leb128.readInt32(r);
+						var v:Int = Leb128.readInt32(r);
 						buf.writeByte(op);
-						if(v > 0){
-							buf.writeInt32(v);
-						} else {
-							buf.writeByte(v);
-						}
-						
+						buf.writeInt32(v);
 					}
 				case i64Const:
 					{
@@ -72,7 +67,7 @@ class Global {
 					}
 				case f32Const:
 					{
-						var v = Read.U32(r);
+						var v:U32 = Read.U32(r);
 						buf.writeByte(op);
 						buf.writeFloat(FPHelper.i32ToFloat(v));
 						// LittleEndian.PutUint32(buf, v);
@@ -130,7 +125,7 @@ class Global {
 	 * @return Dynamic
 	 */
 	public static function execInitExpr(module:Module, expr:Bytes):Dynamic {
-		var stack:Array<U64> = [];
+		var stack:Array<Dynamic> = [];
 		var lastVal:ValueType = -1;
 		var r = new BytesInput(expr);
 
@@ -146,7 +141,11 @@ class Global {
 						{
 							var i = Leb128.readInt32(r);
 							#if !cs
+							#if java 
+							stack.push(numerix.ULong.valueOf(i));
+							#else 
 							stack.push(cast i);
+							#end
 							#else
 							stack.push(untyped __cs__('System.Convert.ToUInt64({0})', i));
 							#end
@@ -156,7 +155,11 @@ class Global {
 						{
 							var i = Leb128.readInt64(r);
 							#if !cs
+							#if java 
+							stack.push(numerix.ULong.valueOf(i));
+							#else 
 							stack.push(cast i);
+							#end
 							#else
 							stack.push(untyped __cs__('System.Convert.ToUInt64({0})', i));
 							#end
@@ -166,7 +169,11 @@ class Global {
 						{
 							var i = Read.U32(r);
 							#if !cs
+							#if java 
+							stack.push(numerix.ULong.valueOf(i));
+							#else 
 							stack.push(cast i);
+							#end
 							#else
 							stack.push(untyped __cs__('System.Convert.ToUInt64({0})', i));
 							#end

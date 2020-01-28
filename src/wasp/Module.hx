@@ -253,8 +253,8 @@ class Module {
 			var nSec:NameSection = new NameSection();
 			var bi = new BytesInput(s.data);
 			nSec.fromWasm(bi);
-			
-			if (nSec.types[NameFunction].length > 0) {
+			var exists = #if cs (nSec.types.ContainsKey(NameFunction)); #else nSec.types.exists(NameFunction); #end
+			if (exists && nSec.types[NameFunction].length > 0) {
 				var sub = nSec.decode(NameFunction);
 				var funcs:FunctionNames = cast sub;
 				names = funcs.names;
