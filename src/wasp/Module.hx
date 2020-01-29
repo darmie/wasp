@@ -260,7 +260,7 @@ class Module {
 				names = funcs.names;
 			}
 		}
-
+	
 		// If available, fill in the name field for the imported functions
 		for (i in 0...functionIndexSpace.length) {
 			functionIndexSpace[i].name = names[cast(i, U32)];
@@ -268,17 +268,20 @@ class Module {
 
 		// Add the functions from the wasm itself to the function list
 		var numImports = functionIndexSpace.length;
+		
 		for (codeIndex in 0...function_.types.length) {
 			var typeIndex = function_.types[codeIndex];
+			
 			if (cast(typeIndex, Int) >= types.entries.length) {
 				var err:InvalidFunctionIndexError = typeIndex;
 				throw err;
 			}
 			// Create the main function structure
-			var fn = new Function(types.entries[cast typeIndex], code.bodies[codeIndex], names[cast(codeIndex + numImports, U32)]);
+			var nameIndex:U32 = (codeIndex + numImports);
+			var fn = new Function(types.entries[cast typeIndex], code.bodies[codeIndex], names[nameIndex]);
 			functionIndexSpace.push(fn);
 		}
-
+		
 		var funcs = [];
 		funcs = funcs.concat(imports.funcs);
 		funcs = funcs.concat(function_.types);
