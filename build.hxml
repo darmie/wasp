@@ -17,5 +17,4 @@
 # --next
 
 # -cs bin/wasp/bin/cs
-
-# -cpp bin/wasp/cpp
+-cpp bin/wasp/cpp
