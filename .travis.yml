@@ -16,7 +16,7 @@ before_install:
   - haxelib git rxhaxe https://github.com/darmie/RxHaxe
   - haxelib git Binary128 https://github.com/darmie/Binary128
   - haxelib git Numerix https://github.com/darmie/Numerix
-  - haxelib install hexlog
+  - haxelib install hexlog 1.0.0-alpha.7
   # - haxelib install hxjava
   - haxelib install hxcpp
   # - haxelib install hxcs
