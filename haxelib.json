@@ -5,7 +5,7 @@
   "tags": ["haxe","js", "cpp", "java", "hl", "neko"],
   "description": "A WebAssembly Utility for Haxe",
   "classPath": "src",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "releasenote": "fix issues related with NameSection, execInitExpr, readInitExpr, Tables, Elements, ElementSegments and CallIndirect",
   "contributors": ["darmie"],
   "dependencies": {

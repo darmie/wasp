@@ -1,6 +1,5 @@
 package wasp;
 
-
 import haxe.Int64;
 import haxe.ds.Vector;
 import haxe.io.*;
@@ -48,10 +47,11 @@ class Global {
 	public static function readInitExpr(r:BytesInput):Bytes {
 		var b = Bytes.alloc(1);
 		var buf = new BytesOutput();
-		
+
 		while (true) {
 			// r.readBytes(b, 0, 1);
 			var op = r.readByte();
+
 			switch op {
 				case i32Const:
 					{
@@ -135,15 +135,25 @@ class Global {
 		while (true) {
 			try {
 				var b = r.readByte();
+
+
+				// hack for invalid op at 0x00
+				var bo = new BytesOutput();
+				bo.writeByte(b);
+				if (bo.getBytes().toHex() == "00") {
+					continue;
+				}
+
+
 				var _break = false;
 				switch b {
 					case i32Const:
 						{
 							var i = Leb128.readInt32(r);
 							#if !cs
-							#if java 
+							#if java
 							stack.push(numerix.ULong.valueOf(i));
-							#else 
+							#else
 							stack.push(cast i);
 							#end
 							#else
@@ -155,9 +165,9 @@ class Global {
 						{
 							var i = Leb128.readInt64(r);
 							#if !cs
-							#if java 
+							#if java
 							stack.push(numerix.ULong.valueOf(i));
-							#else 
+							#else
 							stack.push(cast i);
 							#end
 							#else
@@ -169,9 +179,9 @@ class Global {
 						{
 							var i = Read.U32(r);
 							#if !cs
-							#if java 
+							#if java
 							stack.push(numerix.ULong.valueOf(i));
-							#else 
+							#else
 							stack.push(cast i);
 							#end
 							#else
@@ -208,9 +218,9 @@ class Global {
 					break;
 				}
 			} catch (e:Dynamic) {
-				if(Std.is(e, Eof)){
+				if (Std.is(e, Eof)) {
 					break;
-				}else {
+				} else {
 					throw e;
 				}
 			}
